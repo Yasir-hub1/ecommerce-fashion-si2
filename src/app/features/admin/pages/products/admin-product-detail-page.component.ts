@@ -25,6 +25,7 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
         <p class="subtitle">Variantes (SKU = talla × color) e imágenes del producto</p>
       </div>
       @if (canManage()) {
+        <button type="button" class="btn btn--ghost" (click)="openBulkModal()">Generar talla × color</button>
         <button type="button" class="btn btn--primary" (click)="openVariantModal()">Nueva variante</button>
       }
     </header>
@@ -69,6 +70,35 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
       </div>
     }
 
+    @if (bulkModal()) {
+      <div class="modal-backdrop" (click)="bulkModal.set(false)">
+        <div class="modal wide" role="dialog" (click)="$event.stopPropagation()">
+          <h2>Generar variantes (talla × color)</h2>
+          <p class="hint">Crea todas las combinaciones seleccionadas que aún no existan.</p>
+          <div class="bulk-grid">
+            <div>
+              <h3>Tallas</h3>
+              @for (s of sizes(); track s.id) {
+                <label class="check"><input type="checkbox" [checked]="bulkSizes().has(s.id)" (change)="toggleBulkSize(s.id)" /> {{ s.code }}</label>
+              }
+            </div>
+            <div>
+              <h3>Colores</h3>
+              @for (c of colors(); track c.id) {
+                <label class="check"><input type="checkbox" [checked]="bulkColors().has(c.id)" (change)="toggleBulkColor(c.id)" /> {{ c.name }}</label>
+              }
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn--ghost" (click)="bulkModal.set(false)">Cancelar</button>
+            <button type="button" class="btn btn--primary" [disabled]="bulkGenerating()" (click)="generateBulk()">
+              {{ bulkGenerating() ? 'Generando…' : 'Generar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     @if (variantModal()) {
       <div class="modal-backdrop" (click)="closeVariantModal()">
         <div class="modal" role="dialog" (click)="$event.stopPropagation()">
@@ -95,7 +125,7 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
       </div>
     }
   `,
-  styles: [ADMIN_CRUD_STYLES, `.back { font-size: 0.875rem; color: var(--color-muted); text-decoration: none; } .meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem; } .section-title { font-family: var(--font-display); font-size: 1.125rem; margin: 1.5rem 0 0.75rem; }`],
+  styles: [ADMIN_CRUD_STYLES, `.back { font-size: 0.875rem; color: var(--color-muted); text-decoration: none; } .meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem; } .section-title { font-family: var(--font-display); font-size: 1.125rem; margin: 1.5rem 0 0.75rem; } .bulk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; } .check { display: flex; gap: 0.5rem; align-items: center; font-size: 0.875rem; margin-bottom: 0.35rem; } .hint { color: var(--color-muted); font-size: 0.875rem; margin: 0; }`],
 })
 export class AdminProductDetailPageComponent implements OnInit {
   private readonly catalog = inject(CatalogAdminApi);
@@ -105,6 +135,10 @@ export class AdminProductDetailPageComponent implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly variantModal = signal(false);
+  protected readonly bulkModal = signal(false);
+  protected readonly bulkGenerating = signal(false);
+  protected readonly bulkSizes = signal(new Set<number>());
+  protected readonly bulkColors = signal(new Set<number>());
   protected readonly product = signal<ProductDetail | null>(null);
   protected readonly variants = signal<VariantDetail[]>([]);
   protected readonly sizes = signal<Size[]>([]);
@@ -153,6 +187,69 @@ export class AdminProductDetailPageComponent implements OnInit {
       price_override: '', barcode: '',
     });
     this.variantModal.set(true);
+  }
+
+  openBulkModal(): void {
+    this.bulkSizes.set(new Set(this.sizes().map((s) => s.id)));
+    this.bulkColors.set(new Set(this.colors().map((c) => c.id)));
+    this.bulkModal.set(true);
+  }
+
+  toggleBulkSize(id: number): void {
+    this.bulkSizes.update((set) => {
+      const next = new Set(set);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  toggleBulkColor(id: number): void {
+    this.bulkColors.update((set) => {
+      const next = new Set(set);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  async generateBulk(): Promise<void> {
+    if (!this.canManage()) return;
+    const sizeIds = [...this.bulkSizes()];
+    const colorIds = [...this.bulkColors()];
+    if (!sizeIds.length || !colorIds.length) {
+      this.notifications.warn('Selecciona al menos una talla y un color');
+      return;
+    }
+
+    const existing = new Set(
+      this.variants().map((v) => {
+        const s = typeof v.size === 'object' ? v.size.id : v.size;
+        const c = typeof v.color === 'object' ? v.color.id : v.color;
+        return `${s}-${c}`;
+      }),
+    );
+
+    this.bulkGenerating.set(true);
+    let created = 0;
+    try {
+      for (const size of sizeIds) {
+        for (const color of colorIds) {
+          if (existing.has(`${size}-${color}`)) continue;
+          await firstValueFrom(this.catalog.createVariant({
+            product: this.productIdInternal,
+            size,
+            color,
+          }));
+          created++;
+        }
+      }
+      this.notifications.success(`${created} variante(s) creada(s)`);
+      this.bulkModal.set(false);
+      await this.loadVariants();
+    } catch {
+      this.notifications.error('Error al generar variantes');
+    } finally {
+      this.bulkGenerating.set(false);
+    }
   }
 
   closeVariantModal(): void { this.variantModal.set(false); }

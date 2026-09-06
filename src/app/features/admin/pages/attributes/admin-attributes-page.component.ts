@@ -26,6 +26,9 @@ type Tab = 'colors' | 'sizes' | 'groups';
           {{ tab() === 'colors' ? 'Nuevo color' : 'Nuevo grupo' }}
         </button>
       }
+      @if (canManage() && tab() === 'sizes') {
+        <button type="button" class="btn btn--primary" (click)="openSizeCreate()">Nueva talla</button>
+      }
     </header>
 
     <div class="tabs">
@@ -50,10 +53,17 @@ type Tab = 'colors' | 'sizes' | 'groups';
     } @else if (tab() === 'sizes') {
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Grupo</th><th>Código</th><th>Orden</th></tr></thead>
+          <thead><tr><th>Grupo</th><th>Código</th><th>Orden</th>@if (canManage()) { <th></th> }</tr></thead>
           <tbody>
             @for (s of sizes(); track s.id) {
-              <tr><td>{{ s.group_name }}</td><td>{{ s.code }}</td><td>{{ s.display_order }}</td></tr>
+              <tr>
+                <td>{{ s.group_name }}</td><td>{{ s.code }}</td><td>{{ s.display_order }}</td>
+                @if (canManage()) {
+                  <td class="actions">
+                    <button type="button" class="btn btn--ghost" (click)="editSize(s)">Editar</button>
+                  </td>
+                }
+              </tr>
             }
           </tbody>
         </table>
@@ -83,6 +93,21 @@ type Tab = 'colors' | 'sizes' | 'groups';
               <div class="modal-actions">
                 <button type="button" class="btn btn--ghost" (click)="closeEditor()">Cancelar</button>
                 <button type="submit" class="btn btn--primary" [disabled]="colorForm.invalid">Guardar</button>
+              </div>
+            </form>
+          } @else if (tab() === 'sizes') {
+            <h2>{{ editingSizeId() ? 'Editar talla' : 'Nueva talla' }}</h2>
+            <form [formGroup]="sizeForm" (ngSubmit)="saveSize()">
+              <label>Grupo
+                <select formControlName="group">
+                  @for (g of groups(); track g.id) { <option [value]="g.id">{{ g.name }}</option> }
+                </select>
+              </label>
+              <label>Código <input formControlName="code" placeholder="M, L, 32…" /></label>
+              <label>Orden <input type="number" formControlName="display_order" /></label>
+              <div class="modal-actions">
+                <button type="button" class="btn btn--ghost" (click)="closeEditor()">Cancelar</button>
+                <button type="submit" class="btn btn--primary" [disabled]="sizeForm.invalid">Guardar</button>
               </div>
             </form>
           } @else {
@@ -122,6 +147,7 @@ export class AdminAttributesPageComponent implements OnInit {
   protected readonly tab = signal<Tab>('colors');
   protected readonly editorOpen = signal(false);
   protected readonly editingColorId = signal<number | null>(null);
+  protected readonly editingSizeId = signal<number | null>(null);
   protected readonly colors = signal<Color[]>([]);
   protected readonly sizes = signal<Size[]>([]);
   protected readonly groups = signal<SizeGroup[]>([]);
@@ -136,6 +162,12 @@ export class AdminAttributesPageComponent implements OnInit {
   protected readonly groupForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
     description: [''],
+  });
+
+  protected readonly sizeForm = this.fb.nonNullable.group({
+    group: ['', Validators.required],
+    code: ['', Validators.required],
+    display_order: [0, Validators.required],
   });
 
   ngOnInit(): void { void this.load(); }
@@ -153,6 +185,26 @@ export class AdminAttributesPageComponent implements OnInit {
   editColor(c: Color): void {
     this.editingColorId.set(c.id);
     this.colorForm.patchValue({ name: c.name, slug: c.slug, hex_code: c.hex_code });
+    this.editorOpen.set(true);
+  }
+
+  openSizeCreate(): void {
+    this.editingSizeId.set(null);
+    this.sizeForm.reset({
+      group: String(this.groups()[0]?.id ?? ''),
+      code: '',
+      display_order: 0,
+    });
+    this.editorOpen.set(true);
+  }
+
+  editSize(s: Size): void {
+    this.editingSizeId.set(s.id);
+    this.sizeForm.patchValue({
+      group: String(s.group),
+      code: s.code,
+      display_order: s.display_order,
+    });
     this.editorOpen.set(true);
   }
 
@@ -178,6 +230,20 @@ export class AdminAttributesPageComponent implements OnInit {
       this.notifications.success('Grupo creado');
       this.closeEditor();
       await this.loadGroups();
+    } catch { this.notifications.error('No se pudo guardar'); }
+  }
+
+  async saveSize(): Promise<void> {
+    if (this.sizeForm.invalid || !this.canManage()) return;
+    const raw = this.sizeForm.getRawValue();
+    const body = { group: Number(raw.group), code: raw.code, display_order: raw.display_order };
+    const id = this.editingSizeId();
+    try {
+      if (id) await firstValueFrom(this.catalog.updateSize(id, body));
+      else await firstValueFrom(this.catalog.createSize(body));
+      this.notifications.success('Talla guardada');
+      this.closeEditor();
+      await this.loadSizes();
     } catch { this.notifications.error('No se pudo guardar'); }
   }
 

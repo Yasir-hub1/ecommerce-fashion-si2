@@ -14,6 +14,7 @@ import { ReservationsApi } from '../../../../core/api/reservations.api';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { BranchContextService } from '../../../../core/services/branch-context.service';
 import { CartStore } from '../../../../core/services/cart.store';
+import { ReservationCartStore } from '../../../../core/services/reservation-cart.store';
 import { NotificationService } from '../../../../core/services/notification.service';
 import type { ProductDetail, ProductImage, ProductVariant, VariantAvailability } from '../../../../core/models/api.models';
 import { productImageUrl } from '../../../../core/models/api.models';
@@ -126,6 +127,14 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
               >
                 Reservar probador
               </button>
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="!canReserve()"
+                (click)="addToReservationCart()"
+              >
+                + Reserva multi-prenda
+              </button>
             </div>
 
             @if (openReservation) {
@@ -202,6 +211,7 @@ export class ProductDetailPageComponent {
   private readonly catalogApi = inject(CatalogApi);
   private readonly reservationsApi = inject(ReservationsApi);
   private readonly cartStore = inject(CartStore);
+  private readonly reservationCart = inject(ReservationCartStore);
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
   protected readonly branchContext = inject(BranchContextService);
@@ -351,6 +361,22 @@ export class ProductDetailPageComponent {
     } catch {
       // error interceptor handles toast
     }
+  }
+
+  addToReservationCart(): void {
+    const variant = this.selectedVariant();
+    const product = this.product();
+    if (!variant || !product) return;
+
+    this.reservationCart.addLine({
+      variantId: variant.id,
+      productName: product.name,
+      sku: variant.sku,
+      sizeName: variant.size_name,
+      colorName: variant.color_name,
+      quantity: 1,
+    });
+    this.notifications.success('Agregado a la reserva — ve a Reserva multi-prenda');
   }
 
   onScheduleChange(event: Event): void {

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { firstValueFrom } from 'rxjs';
@@ -11,7 +12,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
 @Component({
   selector: 'app-orders-page',
   standalone: true,
-  imports: [PricePipe, EmptyStateComponent],
+  imports: [RouterLink, PricePipe, EmptyStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1 class="page-title">Mis compras</h1>
@@ -21,7 +22,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
       <app-empty-state icon="📦" title="Sin compras" description="Tus pedidos aparecerán aquí." />
     } @else {
       @for (order of orders(); track order.id) {
-        <article class="row">
+        <a [routerLink]="['/ecommerce/cuenta/pedidos', order.id]" class="row">
           <div>
             <strong>{{ order.code }}</strong>
             <p class="meta">{{ order.branch_name }} · {{ formatDate(order.created_at) }}</p>
@@ -30,7 +31,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
             <span class="status">{{ order.status_display }}</span>
             <span class="price">{{ order.grand_total | price }}</span>
           </div>
-        </article>
+        </a>
       }
     }
   `,
@@ -39,7 +40,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .row {
       display: flex; justify-content: space-between; gap: 1rem; align-items: center;
       padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
-      background: var(--color-surface); margin-bottom: 0.75rem;
+      background: var(--color-surface); margin-bottom: 0.75rem; text-decoration: none; color: inherit;
     }
     .meta { margin: 0.25rem 0 0; color: var(--color-muted); font-size: 0.875rem; }
     .right { text-align: right; display: grid; gap: 0.25rem; }

@@ -14,6 +14,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   PAYMENT_FAILED: 'El pago no pudo procesarse. Intenta de nuevo.',
   BRANCH_CLOSED_AT_TIME: 'La sucursal está cerrada en ese horario.',
   FITTING_SLOT_FULL: 'No hay cupo en el probador para esa hora.',
+  REFERENCED_ENTITY: 'No se puede eliminar porque está en uso por otros registros.',
+  INTEGRITY_ERROR: 'Conflicto de datos: revisa que no exista un registro duplicado.',
 };
 
 let refreshInFlight: Observable<string | null> | null = null;
@@ -66,8 +68,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const body = error.error as ApiErrorBody | undefined;
       const code = body?.error?.code ?? body?.code;
       const message =
-        (code && ERROR_MESSAGES[code]) ||
         body?.error?.message ||
+        (code && ERROR_MESSAGES[code]) ||
         body?.message ||
         body?.detail ||
         'Ocurrió un error inesperado.';

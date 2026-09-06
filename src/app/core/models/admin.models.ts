@@ -58,6 +58,8 @@ export interface Brand {
   name: string;
   slug: string;
   logo?: string | null;
+  logo_url?: string | null;
+  products_count?: number;
 }
 
 export interface ProductWritePayload {

@@ -45,21 +45,25 @@ export class PermissionService {
   }
 
   has(code: string): boolean {
+    if (this._role() === 'ADMIN') return true;
     return this._codes().includes(code);
   }
 
   hasAny(...codes: string[]): boolean {
+    if (this._role() === 'ADMIN') return true;
     if (codes.length === 0) return true;
     const set = this._codes();
     return codes.some((c) => set.includes(c));
   }
 
   hasAll(...codes: string[]): boolean {
+    if (this._role() === 'ADMIN') return true;
     const set = this._codes();
     return codes.every((c) => set.includes(c));
   }
 
   canAccessNavItem(item: AdminNavItem): boolean {
+    if (item.roles?.length && !item.roles.includes(this._role())) return false;
     if (!item.permissions?.length) return true;
     return this.hasAny(...item.permissions);
   }

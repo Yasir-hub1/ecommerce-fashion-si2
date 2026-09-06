@@ -24,6 +24,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
           Contraseña
           <input type="password" formControlName="password" autocomplete="current-password" />
         </label>
+        <p class="forgot"><a routerLink="/auth/recuperar">¿Olvidaste tu contraseña?</a></p>
 
         @if (error()) {
           <p class="error" role="alert">{{ error() }}</p>
@@ -55,6 +56,8 @@ import { NotificationService } from '../../../../core/services/notification.serv
       padding: 0.75rem 0.875rem; font: inherit; background: var(--color-bg);
     }
     .error { color: #b91c1c; font-size: 0.875rem; margin: 0; }
+    .forgot { margin: 0; text-align: right; font-size: 0.8125rem; }
+    .forgot a { color: var(--color-accent); }
     .footer-link { margin-top: 1.25rem; text-align: center; color: var(--color-muted); font-size: 0.875rem; }
     .footer-link a { color: var(--color-accent); }
   `,

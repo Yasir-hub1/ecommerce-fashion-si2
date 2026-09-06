@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { toHttpParams } from './http-params.util';
 import type {
   PaginatedResponse,
   CheckoutSessionData,
@@ -16,8 +17,10 @@ export class ReservationsApi {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/reservations`;
 
-  list(): Observable<PaginatedResponse<ReservationListItem>> {
-    return this.http.get<PaginatedResponse<ReservationListItem>>(`${this.base}/`);
+  list(params?: Record<string, string | number>): Observable<PaginatedResponse<ReservationListItem>> {
+    return this.http.get<PaginatedResponse<ReservationListItem>>(`${this.base}/`, {
+      params: toHttpParams(params),
+    });
   }
 
   myReservations(): Observable<PaginatedResponse<ReservationListItem>> {
@@ -79,23 +82,6 @@ export class PaymentsApi {
   getSessionStatus(sessionId: string): Observable<CheckoutSessionStatus> {
     return this.http.get<CheckoutSessionStatus>(
       `${this.base}/checkout-session/${sessionId}/status/`,
-    );
-  }
-}
-
-@Injectable({ providedIn: 'root' })
-export class PosApi {
-  private readonly http = inject(HttpClient);
-  private readonly base = `${environment.apiUrl}/pos`;
-
-  createSale(payload: {
-    items: { variant_id: number; quantity: number }[];
-    payments: { method: string; amount: string; received_amount?: string }[];
-    reservation_id?: number;
-  }): Observable<{ message: string; order: import('../models/api.models').OrderDetail }> {
-    return this.http.post<{ message: string; order: import('../models/api.models').OrderDetail }>(
-      `${this.base}/sales/`,
-      payload,
     );
   }
 }

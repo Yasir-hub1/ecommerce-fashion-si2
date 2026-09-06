@@ -50,6 +50,22 @@ export class AuthApi {
       new_password_confirm: newPassword,
     });
   }
+
+  updateProfile(userId: number, body: Partial<UserProfile>): Observable<UserProfile> {
+    return this.http.patch<UserProfile>(`${this.base}/users/${userId}/`, body);
+  }
+
+  requestPasswordReset(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/auth/password-reset/`, { email });
+  }
+
+  confirmPasswordReset(token: string, password: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/auth/password-reset/confirm/`, {
+      token,
+      password,
+      password_confirm: password,
+    });
+  }
 }
 
 @Injectable({ providedIn: 'root' })
@@ -89,6 +105,39 @@ export class CatalogApi {
   listBrands(): Observable<PaginatedResponse<import('../models/api.models').Brand>> {
     return this.http.get<PaginatedResponse<import('../models/api.models').Brand>>(
       `${this.base}/brands/`,
+    );
+  }
+
+  listSeasons(): Observable<PaginatedResponse<import('../models/admin.models').Season>> {
+    return this.http.get<PaginatedResponse<import('../models/admin.models').Season>>(
+      `${this.base}/seasons/`,
+    );
+  }
+
+  listCollections(params?: Record<string, string | number>): Observable<PaginatedResponse<import('../models/admin.models').Collection>> {
+    return this.http.get<PaginatedResponse<import('../models/admin.models').Collection>>(
+      `${this.base}/collections/`,
+      { params: new HttpParams({ fromObject: params as Record<string, string> }) },
+    );
+  }
+
+  listColors(): Observable<PaginatedResponse<import('../models/admin.models').Color>> {
+    return this.http.get<PaginatedResponse<import('../models/admin.models').Color>>(
+      `${this.base}/colors/`,
+    );
+  }
+
+  listSizes(params?: Record<string, string | number>): Observable<PaginatedResponse<import('../models/admin.models').Size>> {
+    return this.http.get<PaginatedResponse<import('../models/admin.models').Size>>(
+      `${this.base}/sizes/`,
+      { params: new HttpParams({ fromObject: params as Record<string, string> }) },
+    );
+  }
+
+  lookupVariantByBarcode(barcode: string): Observable<import('../models/admin.models').VariantDetail | null> {
+    return this.http.get<import('../models/admin.models').VariantDetail>(
+      `${this.base}/variants/lookup/`,
+      { params: { barcode } },
     );
   }
 }

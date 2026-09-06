@@ -21,7 +21,7 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
     <header class="page-header">
       <div>
         <h1 class="page-title">Usuarios</h1>
-        <p class="subtitle">Roles RBAC · crear empleados de sucursal (encargado/cajero).</p>
+        <p class="subtitle">Roles  · crear empleados de sucursal (encargado/cajero).</p>
       </div>
       @if (canManage()) {
         <button type="button" class="btn btn--primary" (click)="openEmployeeModal()">Nuevo empleado</button>
@@ -73,8 +73,9 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
             <div class="form-row">
               <label>Rol
                 <select formControlName="role">
-                  <option value="BRANCH_MANAGER">Encargado de sucursal</option>
-                  <option value="CASHIER">Cajero</option>
+                  @for (r of assignableRoles(); track r.code) {
+                    <option [value]="r.code">{{ r.name }}</option>
+                  }
                 </select>
               </label>
               <label>Puesto

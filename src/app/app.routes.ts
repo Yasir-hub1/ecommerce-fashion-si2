@@ -81,6 +81,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'reserva',
+        canActivate: [authGuard, ecommerceCustomerGuard],
+        loadComponent: () =>
+          import('./features/account/pages/reservation-cart/reservation-cart-page.component').then(
+            (m) => m.ReservationCartPageComponent,
+          ),
+      },
+      {
+        path: 'cuenta/pedidos/:id',
+        canActivate: [authGuard, ecommerceCustomerGuard],
+        loadComponent: () =>
+          import('./features/account/pages/order-detail/order-detail-page.component').then(
+            (m) => m.OrderDetailPageComponent,
+          ),
+      },
+      {
         path: 'asistente',
         loadComponent: () =>
           import('./features/assistant/pages/chat/assistant-page.component').then(
@@ -151,11 +167,27 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'marcas',
+        canActivate: [permissionGuard('catalog.products.view')],
+        loadComponent: () =>
+          import('./features/admin/pages/brands/admin-brands-page.component').then(
+            (m) => m.AdminBrandsPageComponent,
+          ),
+      },
+      {
         path: 'categorias',
         canActivate: [permissionGuard('catalog.products.view')],
         loadComponent: () =>
           import('./features/admin/pages/categories/admin-categories-page.component').then(
             (m) => m.AdminCategoriesPageComponent,
+          ),
+      },
+      {
+        path: 'promociones',
+        canActivate: [permissionGuard('promotions.view')],
+        loadComponent: () =>
+          import('./features/admin/pages/promotions/admin-promotions-page.component').then(
+            (m) => m.AdminPromotionsPageComponent,
           ),
       },
       {
@@ -199,12 +231,47 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'reservas/dia',
+        canActivate: [permissionGuard('reservations.view')],
+        loadComponent: () =>
+          import('./features/branch/pages/reservations-panel/reservations-panel-page.component').then(
+            (m) => m.ReservationsPanelPageComponent,
+          ),
+      },
+      {
         path: 'reservas',
         canActivate: [permissionGuard('reservations.view')],
         loadComponent: () =>
           import('./features/admin/pages/reservations/admin-reservations-page.component').then(
             (m) => m.AdminReservationsPageComponent,
           ),
+      },
+      {
+        path: 'portal-proveedor',
+        canActivate: [staffGuard],
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/supplier/pages/products/supplier-products-page.component').then(
+                (m) => m.SupplierProductsPageComponent,
+              ),
+          },
+          {
+            path: 'colecciones',
+            loadComponent: () =>
+              import('./features/supplier/pages/collections/supplier-collections-page.component').then(
+                (m) => m.SupplierCollectionsPageComponent,
+              ),
+          },
+          {
+            path: 'enviar-producto',
+            loadComponent: () =>
+              import('./features/supplier/pages/submit-product/supplier-submit-product-page.component').then(
+                (m) => m.SupplierSubmitProductPageComponent,
+              ),
+          },
+        ],
       },
       {
         path: 'ordenes',
@@ -269,6 +336,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/auth/pages/register/register-page.component').then(
             (m) => m.RegisterPageComponent,
+          ),
+      },
+      {
+        path: 'recuperar',
+        canActivate: [guestGuard],
+        loadComponent: () =>
+          import('./features/auth/pages/forgot-password/forgot-password-page.component').then(
+            (m) => m.ForgotPasswordPageComponent,
           ),
       },
     ],

@@ -17,7 +17,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     <header class="page-header">
       <div>
         <h1 class="page-title">Permisos</h1>
-        <p class="subtitle">Catálogo de permisos granulares del sistema RBAC.</p>
+        <p class="subtitle">Catálogo de permisos granulares del sistema.</p>
       </div>
       @if (canManage()) {
         <button type="button" class="btn btn--primary" (click)="openCreate()">Nuevo permiso</button>

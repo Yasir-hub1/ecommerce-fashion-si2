@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@ang
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import { CatalogApi } from '../../../../core/api/auth.api';
+import { CatalogAdminApi } from '../../../../core/api/catalog-admin.api';
 import type { ProductListItem } from '../../../../core/models/api.models';
+import { StaffContextService } from '../../../../core/services/staff-context.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
 
@@ -14,9 +15,10 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h1 class="page-title">Productos del catálogo</h1>
-    <p class="hint">Vista de lectura de productos y colecciones activas</p>
-    @if (!products().length && !loading()) {
-      <app-empty-state icon="👕" title="Sin productos" description="El administrador publica productos en el catálogo." />
+    <p class="hint">Vista de lectura de productos en tus colecciones</p>
+    @if (loading()) { <p>Cargando…</p> }
+    @else if (!products().length) {
+      <app-empty-state icon="👕" title="Sin productos" description="No hay productos publicados en tus colecciones." />
     } @else {
       @for (p of products(); track p.id) {
         <article class="row">
@@ -42,7 +44,9 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   `,
 })
 export class SupplierProductsPageComponent implements OnInit {
-  private readonly catalogApi = inject(CatalogApi);
+  private readonly catalog = inject(CatalogAdminApi);
+  private readonly staff = inject(StaffContextService);
+
   protected readonly loading = signal(true);
   protected readonly products = signal<ProductListItem[]>([]);
 
@@ -50,8 +54,34 @@ export class SupplierProductsPageComponent implements OnInit {
 
   private async load(): Promise<void> {
     try {
-      const res = await firstValueFrom(this.catalogApi.listProducts({}));
-      this.products.set(res.results);
-    } finally { this.loading.set(false); }
+      if (this.staff.isSupplier()) {
+        const supplierId = await this.staff.resolveSupplierId();
+        if (!supplierId) {
+          this.products.set([]);
+          return;
+        }
+        const collectionsRes = await firstValueFrom(
+          this.catalog.listCollections({ supplier: supplierId }),
+        );
+        const collectionIds = collectionsRes.results.map((c) => c.id);
+        if (!collectionIds.length) {
+          this.products.set([]);
+          return;
+        }
+        const batches = await Promise.all(
+          collectionIds.map((id) =>
+            firstValueFrom(this.catalog.listProducts({ collection: id })),
+          ),
+        );
+        const merged = batches.flatMap((res) => res.results);
+        const unique = [...new Map(merged.map((p) => [p.id, p])).values()];
+        this.products.set(unique);
+      } else {
+        const res = await firstValueFrom(this.catalog.listProducts({}));
+        this.products.set(res.results);
+      }
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

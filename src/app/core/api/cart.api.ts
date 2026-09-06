@@ -3,7 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { toHttpParams } from './http-params.util';
 import type { Cart, OrderDetail, OrderListItem, PaginatedResponse } from '../models/api.models';
+
+export interface OrderReceipt {
+  id: number;
+  receipt_number: string;
+  pdf_url: string;
+  order_code: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CartApi {
@@ -33,10 +41,15 @@ export class CartApi {
     return this.http.delete<{ message: string }>(`${this.base}/clear/`);
   }
 
-  checkout(branchId: number, channel = 'WEB'): Observable<{ message: string; order: OrderDetail }> {
+  checkout(
+    branchId: number,
+    channel = 'WEB',
+    promotionCode?: string,
+  ): Observable<{ message: string; order: OrderDetail }> {
     return this.http.post<{ message: string; order: OrderDetail }>(`${this.base}/checkout/`, {
       branch_id: branchId,
       channel,
+      ...(promotionCode ? { promotion_code: promotionCode } : {}),
     });
   }
 }
@@ -46,12 +59,22 @@ export class OrdersApi {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/orders`;
 
-  list(): Observable<PaginatedResponse<OrderListItem>> {
-    return this.http.get<PaginatedResponse<OrderListItem>>(`${this.base}/`);
+  list(params?: Record<string, string | number>): Observable<PaginatedResponse<OrderListItem>> {
+    return this.http.get<PaginatedResponse<OrderListItem>>(`${this.base}/`, {
+      params: toHttpParams(params),
+    });
   }
 
   get(id: number): Observable<OrderDetail> {
     return this.http.get<OrderDetail>(`${this.base}/${id}/`);
+  }
+
+  getReceipt(orderId: number): Observable<OrderReceipt> {
+    return this.http.get<OrderReceipt>(`${this.base}/${orderId}/receipt/`);
+  }
+
+  receiptPdfUrl(orderId: number): string {
+    return `${environment.apiUrl}/orders/${orderId}/receipt/pdf/`;
   }
 
   cancel(id: number): Observable<{ message: string; order: OrderDetail }> {

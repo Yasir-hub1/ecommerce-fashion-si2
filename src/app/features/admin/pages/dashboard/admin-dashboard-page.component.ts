@@ -15,7 +15,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
   template: `
     <h1 class="page-title">Panel administrativo</h1>
     <p class="subtitle">
-      {{ roleName() || 'Backoffice' }} · accesos según tus permisos RBAC
+      {{ roleName() || 'Backoffice' }} · accesos según tus permisos
     </p>
 
     <div class="stats">

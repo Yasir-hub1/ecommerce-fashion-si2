@@ -65,6 +65,7 @@ export function permissionGuard(...codes: string[]): CanActivateFn {
     if (auth.user()?.role === 'CUSTOMER') {
       return router.createUrlTree(['/ecommerce']);
     }
+    if (auth.user()?.role === 'ADMIN') return true;
     if (perms.hasAny(...codes)) return true;
     return router.createUrlTree(['/admin']);
   };

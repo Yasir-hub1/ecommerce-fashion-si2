@@ -109,12 +109,33 @@ export class CatalogAdminApi {
     return this.http.get<PaginatedResponse<Brand>>(`${this.base}/brands/`);
   }
 
-  createBrand(body: Partial<Brand>): Observable<Brand> {
+  createBrand(body: FormData | Pick<Brand, 'name' | 'slug'>): Observable<Brand> {
     return this.http.post<Brand>(`${this.base}/brands/`, body);
   }
 
-  updateBrand(id: number, body: Partial<Brand>): Observable<Brand> {
+  updateBrand(
+    id: number,
+    body: FormData | (Pick<Brand, 'name' | 'slug'> & { remove_logo?: boolean }),
+  ): Observable<Brand> {
     return this.http.patch<Brand>(`${this.base}/brands/${id}/`, body);
+  }
+
+  buildBrandFormData(
+    name: string,
+    slug: string,
+    logoFile?: File | null,
+    removeLogo?: boolean,
+  ): FormData {
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('slug', slug);
+    if (logoFile) fd.append('logo', logoFile);
+    if (removeLogo) fd.append('remove_logo', 'true');
+    return fd;
+  }
+
+  deleteBrand(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/brands/${id}/`);
   }
 
   listSizeGroups(): Observable<PaginatedResponse<SizeGroup>> {
@@ -131,6 +152,14 @@ export class CatalogAdminApi {
 
   createSize(body: Partial<Size>): Observable<Size> {
     return this.http.post<Size>(`${this.base}/sizes/`, body);
+  }
+
+  updateSize(id: number, body: Partial<Size>): Observable<Size> {
+    return this.http.patch<Size>(`${this.base}/sizes/${id}/`, body);
+  }
+
+  deleteSize(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/sizes/${id}/`);
   }
 
   listColors(): Observable<PaginatedResponse<Color>> {

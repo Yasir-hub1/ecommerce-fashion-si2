@@ -88,6 +88,10 @@ export class AuthService {
     await this.login(payload.email, payload.password);
   }
 
+  async refreshProfile(): Promise<void> {
+    await this.loadProfile();
+  }
+
   logout(): void {
     this.clearSession();
     void this.router.navigate(['/auth/login']);
