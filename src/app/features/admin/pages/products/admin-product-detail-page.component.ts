@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { ArAssetsManagerComponent } from '../../../../features/catalog/components/ar-assets/ar-assets-manager.component';
 import { ProductImagesManagerComponent } from '../../../../features/catalog/components/product-images/product-images-manager.component';
 import { CatalogAdminApi } from '../../../../core/api/catalog-admin.api';
 import type { Color, Size, VariantDetail } from '../../../../core/models/admin.models';
@@ -15,14 +16,14 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
 @Component({
   selector: 'app-admin-product-detail-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, PricePipe, ProductImagesManagerComponent],
+  imports: [RouterLink, ReactiveFormsModule, PricePipe, ProductImagesManagerComponent, ArAssetsManagerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="page-header">
       <div>
         <a routerLink="/admin/productos" class="back">← Productos</a>
         <h1 class="page-title">{{ product()?.name ?? 'Producto' }}</h1>
-        <p class="subtitle">Variantes (SKU = talla × color) e imágenes del producto</p>
+        <p class="subtitle">Variantes, imágenes y overlay AR del producto</p>
       </div>
       @if (canManage()) {
         <button type="button" class="btn btn--ghost" (click)="openBulkModal()">Generar talla × color</button>
@@ -42,6 +43,12 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
         [canManage]="canManage()"
         [colors]="colors()"
         (changed)="onImagesChanged()"
+      />
+
+      <app-ar-assets-manager
+        [productId]="productId"
+        [canManage]="canManage()"
+        [colors]="colors()"
       />
 
       <h2 class="section-title">Variantes</h2>
