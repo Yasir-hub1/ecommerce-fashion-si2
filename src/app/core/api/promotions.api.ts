@@ -10,12 +10,15 @@ export interface Promotion {
   id: number;
   code: string;
   name: string;
-  description: string;
-  discount_type: 'PERCENTAGE' | 'FIXED';
+  description?: string;
+  discount_type: 'PERCENTAGE' | 'PERCENT' | 'FIXED';
+  /** Backend field alias for `value`. */
   discount_value: string;
+  value?: string;
   min_order_amount: string;
   max_uses: number | null;
-  uses_count: number;
+  uses_count?: number;
+  used_count?: number;
   starts_at: string;
   ends_at: string;
   is_active: boolean;

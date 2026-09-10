@@ -61,6 +61,7 @@ type Tab = 'colors' | 'sizes' | 'groups';
                 @if (canManage()) {
                   <td class="actions">
                     <button type="button" class="btn btn--ghost" (click)="editSize(s)">Editar</button>
+                    <button type="button" class="btn btn--ghost danger" (click)="removeSize(s)">Eliminar</button>
                   </td>
                 }
               </tr>
@@ -71,10 +72,18 @@ type Tab = 'colors' | 'sizes' | 'groups';
     } @else {
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Grupo</th><th>Descripción</th></tr></thead>
+          <thead><tr><th>Grupo</th><th>Descripción</th>@if (canManage()) { <th></th> }</tr></thead>
           <tbody>
             @for (g of groups(); track g.id) {
-              <tr><td>{{ g.name }}</td><td>{{ g.description ?? '—' }}</td></tr>
+              <tr>
+                <td>{{ g.name }}</td>
+                <td>{{ g.description || '—' }}</td>
+                @if (canManage()) {
+                  <td class="actions">
+                    <button type="button" class="btn btn--ghost danger" (click)="removeGroup(g)">Eliminar</button>
+                  </td>
+                }
+              </tr>
             }
           </tbody>
         </table>
@@ -254,6 +263,28 @@ export class AdminAttributesPageComponent implements OnInit {
       this.notifications.info('Color eliminado');
       await this.loadColors();
     } catch { this.notifications.error('No se pudo eliminar'); }
+  }
+
+  async removeSize(s: Size): Promise<void> {
+    if (!confirm(`¿Eliminar talla ${s.code}?`)) return;
+    try {
+      await firstValueFrom(this.catalog.deleteSize(s.id));
+      this.notifications.info('Talla eliminada');
+      await this.loadSizes();
+    } catch {
+      this.notifications.error('No se pudo eliminar (puede estar en uso por variantes)');
+    }
+  }
+
+  async removeGroup(g: SizeGroup): Promise<void> {
+    if (!confirm(`¿Eliminar grupo ${g.name}?`)) return;
+    try {
+      await firstValueFrom(this.catalog.deleteSizeGroup(g.id));
+      this.notifications.info('Grupo eliminado');
+      await Promise.all([this.loadGroups(), this.loadSizes()]);
+    } catch {
+      this.notifications.error('No se pudo eliminar (puede tener tallas asociadas)');
+    }
   }
 
   private async load(): Promise<void> {

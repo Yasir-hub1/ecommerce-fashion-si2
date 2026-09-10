@@ -34,7 +34,7 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
     } @else {
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th></tr></thead>
+          <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th>@if (canManage()) { <th></th> }</tr></thead>
           <tbody>
             @for (u of users(); track u.id) {
               <tr>
@@ -52,6 +52,16 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
                   }
                 </td>
                 <td>{{ u.is_active ? 'Activo' : 'Inactivo' }}</td>
+                @if (canManage()) {
+                  <td class="actions">
+                    <button
+                      type="button"
+                      class="btn btn--ghost danger"
+                      [disabled]="savingId() === u.id"
+                      (click)="removeUser(u)"
+                    >Eliminar</button>
+                  </td>
+                }
               </tr>
             }
           </tbody>
@@ -177,6 +187,21 @@ export class AdminUsersPageComponent implements OnInit {
       this.notifications.error('No se pudo cambiar el rol');
       (event.target as HTMLSelectElement).value = user.role;
     } finally { this.savingId.set(null); }
+  }
+
+  async removeUser(user: UserProfile): Promise<void> {
+    if (!this.canManage()) return;
+    if (!confirm(`¿Eliminar a ${user.first_name} ${user.last_name} (${user.email})?`)) return;
+    this.savingId.set(user.id);
+    try {
+      await firstValueFrom(this.orgApi.deleteUser(user.id));
+      this.notifications.info('Usuario eliminado');
+      await this.loadUsers();
+    } catch {
+      this.notifications.error('No se pudo eliminar el usuario');
+    } finally {
+      this.savingId.set(null);
+    }
   }
 
   private async load(): Promise<void> {

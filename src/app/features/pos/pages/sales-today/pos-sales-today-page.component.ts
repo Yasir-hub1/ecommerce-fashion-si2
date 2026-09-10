@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { openPosReceiptPdf, PosApi } from '../../../../core/api/pos.api';
 import type { PosDailySummary, PosSaleListItem } from '../../../../core/models/pos.models';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PosBranchService } from '../../../../core/services/pos-branch.service';
 import { PosSubnavComponent } from '../../components/pos-subnav/pos-subnav.component';
@@ -25,6 +26,10 @@ const PAYMENT_LABELS: Record<string, string> = {
   template: `
     <app-pos-subnav />
     <h1 class="page-title">Ventas del día</h1>
+
+    @if (error(); as err) {
+      <p class="warn">{{ err }}</p>
+    }
 
     @if (loading()) {
       <p class="muted">Cargando resumen…</p>
@@ -69,7 +74,7 @@ const PAYMENT_LABELS: Record<string, string> = {
         <article class="row">
           <div>
             <strong>{{ sale.code }}</strong>
-            <p>{{ fmt(sale.paid_at ?? sale.created_at) }} · {{ sale.status_display }}</p>
+            <p>{{ fmt(sale.paid_at || sale.created_at) }} · {{ sale.status_display || sale.status || 'Pagada' }}</p>
             @if (sale.customer_name) {
               <p class="customer">{{ sale.customer_name }}</p>
             }
@@ -86,6 +91,7 @@ const PAYMENT_LABELS: Record<string, string> = {
     .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
     .section-title { font-size: 1rem; margin: 1.5rem 0 0.75rem; font-family: var(--font-display); }
     .muted { color: var(--color-muted); }
+    .warn { color: #b45309; margin: 0 0 1rem; }
     .summary {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;
     }
@@ -115,8 +121,10 @@ const PAYMENT_LABELS: Record<string, string> = {
 export class PosSalesTodayPageComponent implements OnInit {
   private readonly posApi = inject(PosApi);
   private readonly posBranch = inject(PosBranchService);
+  private readonly notifications = inject(NotificationService);
 
   protected readonly loading = signal(true);
+  protected readonly error = signal<string | null>(null);
   protected readonly summary = signal<PosDailySummary | null>(null);
   protected readonly sales = signal<PosSaleListItem[]>([]);
 
@@ -124,8 +132,11 @@ export class PosSalesTodayPageComponent implements OnInit {
     void this.posBranch.ensureReady().then(() => this.load());
   }
 
-  protected fmt(v: string): string {
-    return format(new Date(v), 'HH:mm', { locale: es });
+  protected fmt(v: string | null | undefined): string {
+    if (!v) return '—';
+    const date = new Date(v);
+    if (Number.isNaN(date.getTime())) return '—';
+    return format(date, 'HH:mm', { locale: es });
   }
 
   protected paymentBreakdown(s: PosDailySummary): { method: string; label: string; total: string; count: number }[] {
@@ -142,15 +153,34 @@ export class PosSalesTodayPageComponent implements OnInit {
   }
 
   private async load(): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    const branchId = this.posBranch.effectiveBranchId();
+    if (branchId == null) {
+      this.error.set('Selecciona una sucursal para ver las ventas del día.');
+      this.loading.set(false);
+      return;
+    }
+
     const today = format(new Date(), 'yyyy-MM-dd');
-    const branchId = this.posBranch.effectiveBranchId() ?? undefined;
     try {
       const [summary, salesRes] = await Promise.all([
         firstValueFrom(this.posApi.dailySummary(today, branchId)),
-        firstValueFrom(this.posApi.listSales({ paid_at__date: today, branch_id: branchId ?? '' })),
+        firstValueFrom(this.posApi.listSales({ paid_at__date: today, branch_id: branchId })),
       ]);
       this.summary.set(summary);
       this.sales.set(salesRes.results);
+    } catch (err: unknown) {
+      const body = (err as { error?: { message?: string; detail?: string; code?: string } })?.error;
+      const message =
+        body?.message ||
+        body?.detail ||
+        (body?.code === 'BRANCH_REQUIRED' ? 'Selecciona una sucursal' : 'No se pudieron cargar las ventas del día');
+      this.error.set(message);
+      this.notifications.error(message);
+      this.summary.set(null);
+      this.sales.set([]);
     } finally {
       this.loading.set(false);
     }

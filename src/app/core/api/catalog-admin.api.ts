@@ -146,6 +146,10 @@ export class CatalogAdminApi {
     return this.http.post<SizeGroup>(`${this.base}/size-groups/`, body);
   }
 
+  deleteSizeGroup(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/size-groups/${id}/`);
+  }
+
   listSizes(params?: Record<string, string | number>): Observable<PaginatedResponse<Size>> {
     return this.http.get<PaginatedResponse<Size>>(`${this.base}/sizes/`, { params: toHttpParams(params) });
   }

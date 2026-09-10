@@ -52,7 +52,7 @@ const DISCOUNT_TYPES = [
                 <td>{{ p.name }}</td>
                 <td>{{ discountLabel(p) }}</td>
                 <td>{{ formatRange(p.starts_at, p.ends_at) }}</td>
-                <td>{{ p.uses_count }}{{ p.max_uses ? ' / ' + p.max_uses : '' }}</td>
+                <td>{{ p.uses_count ?? p.used_count ?? 0 }}{{ p.max_uses ? ' / ' + p.max_uses : '' }}</td>
                 <td>{{ p.is_active ? 'Activa' : 'Inactiva' }}</td>
                 @if (canManage()) {
                   <td class="actions">
@@ -138,7 +138,9 @@ export class AdminPromotionsPageComponent implements OnInit {
   ngOnInit(): void { void this.load(); }
 
   discountLabel(p: Promotion): string {
-    return p.discount_type === 'PERCENTAGE' ? `${p.discount_value}%` : `Bs ${p.discount_value}`;
+    const type = p.discount_type === 'PERCENT' || p.discount_type === 'PERCENTAGE' ? 'PERCENTAGE' : 'FIXED';
+    const value = p.discount_value ?? p.value ?? '0';
+    return type === 'PERCENTAGE' ? `${value}%` : `Bs ${value}`;
   }
 
   formatRange(from: string, to: string): string {
@@ -157,12 +159,14 @@ export class AdminPromotionsPageComponent implements OnInit {
 
   openEdit(p: Promotion): void {
     this.editingId.set(p.id);
+    const discountType =
+      p.discount_type === 'PERCENT' || p.discount_type === 'PERCENTAGE' ? 'PERCENTAGE' : 'FIXED';
     this.form.patchValue({
       code: p.code,
       name: p.name,
-      description: p.description,
-      discount_type: p.discount_type,
-      discount_value: p.discount_value,
+      description: p.description ?? '',
+      discount_type: discountType,
+      discount_value: p.discount_value ?? p.value ?? '',
       min_order_amount: p.min_order_amount,
       max_uses: p.max_uses != null ? String(p.max_uses) : '',
       starts_at: toDatetimeLocal(p.starts_at),
