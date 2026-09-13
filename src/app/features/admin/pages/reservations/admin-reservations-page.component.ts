@@ -8,6 +8,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
 import { NotificationService } from '../../../../core/services/notification.service';
 import type { ReservationListItem } from '../../../../core/models/api.models';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 const NEXT_STATUS: Record<string, string> = {
   PENDING: 'PREPARING',
@@ -54,20 +55,7 @@ const NEXT_STATUS: Record<string, string> = {
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .subtitle { color: var(--color-muted); margin: 0.25rem 0 1rem; font-size: 0.875rem; }
-    .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start;
-      padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
-      background: var(--color-surface); margin-bottom: 0.5rem;
-    }
-    p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
-    .time { font-weight: 600; color: var(--color-text); }
-    .right { text-align: right; display: grid; gap: 0.5rem; font-size: 0.8125rem; }
-    .badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 999px; background: var(--color-surface-2); justify-self: end; }
-    .actions { display: flex; gap: 0.375rem; flex-wrap: wrap; justify-content: flex-end; }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class AdminReservationsPageComponent implements OnInit {
   private readonly reservationsApi = inject(ReservationsApi);

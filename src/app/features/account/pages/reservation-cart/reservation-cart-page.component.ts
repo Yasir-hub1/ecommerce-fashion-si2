@@ -71,8 +71,8 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     }
     p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
     .qty { display: flex; gap: 0.35rem; align-items: center; }
-    .qty button { width: 1.75rem; height: 1.75rem; border: 1px solid var(--color-border); border-radius: 0.375rem; }
-    .remove { border: none; background: none; color: #b91c1c; cursor: pointer; font-size: 0.8125rem; }
+    .qty button { width: 2.5rem; height: 2.5rem; border: 1px solid var(--color-border); border-radius: 0.375rem; }
+    .remove { border: none; background: none; color: #b91c1c; cursor: pointer; font-size: 0.8125rem; min-height: 2.5rem; }
     .panel {
       padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
       background: var(--color-surface); display: grid; gap: 0.75rem;
@@ -81,8 +81,12 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     label { display: grid; gap: 0.35rem; font-size: 0.875rem; font-weight: 500; }
     input, textarea {
       padding: 0.625rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit;
+      width: 100%; min-height: 2.75rem;
     }
-    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
   `,
 })
 export class ReservationCartPageComponent {

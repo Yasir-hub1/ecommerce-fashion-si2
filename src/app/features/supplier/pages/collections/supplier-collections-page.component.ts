@@ -5,6 +5,7 @@ import { CatalogAdminApi } from '../../../../core/api/catalog-admin.api';
 import type { Collection } from '../../../../core/models/admin.models';
 import { StaffContextService } from '../../../../core/services/staff-context.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-supplier-collections-page',
@@ -29,17 +30,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .hint { color: var(--color-muted); margin: 0.25rem 0 1rem; font-size: 0.875rem; }
-    .row {
-      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
-      padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
-      background: var(--color-surface); margin-bottom: 0.5rem;
-    }
-    p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
-    .badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 999px; background: var(--color-surface-2); }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class SupplierCollectionsPageComponent implements OnInit {
   private readonly catalog = inject(CatalogAdminApi);

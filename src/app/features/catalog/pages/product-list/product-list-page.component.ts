@@ -122,8 +122,8 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .reco__grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .reco-card { padding: 0.4rem 0.75rem; border-radius: 999px; background: var(--color-surface-2); text-decoration: none; color: inherit; font-size: 0.875rem; }
     .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 1.5rem; }
-    .filters input, .filters select { border: 1px solid var(--color-border); border-radius: 0.75rem; padding: 0.65rem 0.75rem; background: var(--color-surface); font: inherit; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+    .filters input, .filters select { border: 1px solid var(--color-border); border-radius: 0.75rem; padding: 0.65rem 0.75rem; background: var(--color-surface); font: inherit; width: 100%; min-height: 2.75rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 1.25rem; }
     .product-card { text-decoration: none; color: inherit; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 1rem; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
     .product-card__media { aspect-ratio: 4/5; background: var(--color-surface-2); position: relative; overflow: hidden; }
@@ -138,6 +138,15 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .stock { margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--color-muted); }
     .skeleton-grid .skeleton-card { aspect-ratio: 3/4; border-radius: 1rem; background: linear-gradient(90deg, var(--color-surface-2), var(--color-border), var(--color-surface-2)); background-size: 200% 100%; animation: shimmer 1.2s infinite; }
     @keyframes shimmer { to { background-position: -200% 0; } }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .product-card__body { padding: 0.75rem; }
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters input { grid-column: 1 / -1; }
+    }
+    @media (max-width: 380px) {
+      .grid { grid-template-columns: 1fr; }
+    }
   `,
 })
 export class ProductListPageComponent {

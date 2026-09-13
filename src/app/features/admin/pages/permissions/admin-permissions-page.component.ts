@@ -7,6 +7,7 @@ import type { AppPermission } from '../../../../core/models/rbac.models';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-admin-permissions-page',
@@ -91,33 +92,12 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     }
   `,
   styles: `
-    .page-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .subtitle { color: var(--color-muted); margin: 0.25rem 0 0; font-size: 0.875rem; }
-    .table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 0.875rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--color-border); }
-    th { background: var(--color-surface-2); }
+    ${ADMIN_CRUD_STYLES}
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--color-border); border-radius: 0.875rem; }
+    table { min-width: 32rem; }
     code { font-size: 0.8125rem; background: var(--color-surface-2); padding: 0.15rem 0.4rem; border-radius: 0.375rem; }
-    .actions { display: flex; gap: 0.375rem; }
+    .actions { display: flex; gap: 0.375rem; flex-wrap: wrap; }
     .danger { color: #b91c1c; }
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-      display: grid; place-items: center; z-index: 100; padding: 1rem;
-    }
-    .modal {
-      width: min(480px, 100%); background: var(--color-surface);
-      border-radius: 1rem; padding: 1.25rem; border: 1px solid var(--color-border);
-    }
-    .modal h2 { margin: 0 0 1rem; font-family: var(--font-display); }
-    form { display: grid; gap: 0.875rem; }
-    label { display: grid; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }
-    label.inline { display: flex; align-items: center; gap: 0.5rem; font-weight: 400; }
-    input, textarea {
-      border: 1px solid var(--color-border); border-radius: 0.625rem;
-      padding: 0.625rem 0.75rem; font: inherit; background: var(--color-bg);
-    }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
   `,
 })
 export class AdminPermissionsPageComponent implements OnInit {

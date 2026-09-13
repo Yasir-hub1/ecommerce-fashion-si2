@@ -175,7 +175,7 @@ interface SpeechRecognitionLike {
     `
       .export-actions { display: flex; gap: 0.375rem; flex-wrap: wrap; }
       .summary-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
         gap: 0.75rem; margin-bottom: 1.25rem;
       }
       .stat-card {
@@ -193,8 +193,14 @@ interface SpeechRecognitionLike {
       .result-box pre { white-space: pre-wrap; margin: 0; font-family: inherit; font-size: 0.875rem; }
       .meta { margin: 0.75rem 0 0; font-size: 0.75rem; color: var(--color-muted); }
       .hint { color: var(--color-muted); font-size: 0.875rem; margin: 0 0 0.75rem; }
-      .voice-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+      .voice-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
       .badge.live { background: #dc2626; color: white; }
+      @media (max-width: 640px) {
+        .export-actions { width: 100%; }
+        .export-actions .btn { flex: 1 1 auto; }
+        .voice-row { flex-direction: column; align-items: stretch; }
+        .gen-form { max-width: none; }
+      }
     `,
   ],
 })

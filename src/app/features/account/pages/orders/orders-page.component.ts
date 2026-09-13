@@ -8,6 +8,7 @@ import { OrdersApi } from '../../../../core/api/cart.api';
 import type { OrderListItem } from '../../../../core/models/api.models';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-orders-page',
@@ -35,18 +36,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
-    .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
-      background: var(--color-surface); margin-bottom: 0.75rem; text-decoration: none; color: inherit;
-    }
-    .meta { margin: 0.25rem 0 0; color: var(--color-muted); font-size: 0.875rem; }
-    .right { text-align: right; display: grid; gap: 0.25rem; }
-    .status { font-size: 0.8125rem; color: var(--color-muted); }
-    .price { font-weight: 700; }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class OrdersPageComponent implements OnInit {
   private readonly ordersApi = inject(OrdersApi);

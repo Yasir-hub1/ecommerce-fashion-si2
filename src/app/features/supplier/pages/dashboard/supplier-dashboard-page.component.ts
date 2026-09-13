@@ -26,15 +26,19 @@ import { CatalogApi } from '../../../../core/api/auth.api';
     </div>
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
+    .page-title { font-family: var(--font-display); margin: 0; font-size: clamp(1.25rem, 4vw, 1.75rem); }
     .subtitle { color: var(--color-muted); margin: 0.25rem 0 1rem; }
     .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
     .stat { padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem; background: var(--color-surface); display: grid; }
-    .stat__value { font-size: 1.5rem; font-weight: 700; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+    .stat__value { font-size: clamp(1.25rem, 5vw, 1.5rem); font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 0.75rem; }
     .tile {
       padding: 1rem; border-radius: 0.875rem; border: 1px solid var(--color-border);
       background: var(--color-surface); text-decoration: none; color: inherit; font-weight: 600; text-align: center;
+      min-height: 2.75rem; display: grid; place-items: center;
+    }
+    @media (max-width: 400px) {
+      .stats { grid-template-columns: 1fr; }
     }
   `,
 })

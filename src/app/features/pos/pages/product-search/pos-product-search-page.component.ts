@@ -56,23 +56,29 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 0.25rem; }
+    .page-title { font-family: var(--font-display); margin: 0 0 0.25rem; font-size: clamp(1.25rem, 4vw, 1.75rem); }
     .hint { color: var(--color-muted); font-size: 0.875rem; margin: 0 0 1rem; }
-    .search { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    input { flex: 1; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit; }
+    .search { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    input { flex: 1 1 12rem; min-width: 0; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit; min-height: 2.75rem; }
     .result {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start;
-      padding: 0.875rem 1rem; margin-bottom: 0.5rem;
+      display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start;
+      padding: 0.875rem 1rem; margin-bottom: 0.5rem; flex-wrap: wrap;
       border: 1px solid var(--color-border); border-radius: 0.625rem; background: var(--color-surface);
     }
     .result p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
-    .barcode { font-family: monospace; }
-    .result__meta { text-align: right; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-end; }
+    .barcode { font-family: monospace; word-break: break-all; }
+    .result__meta { text-align: right; display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-end; margin-left: auto; }
     .price { font-weight: 600; }
     .stock { font-size: 0.8125rem; color: #047857; }
     .stock--low { color: #b45309; }
     .link { font-size: 0.8125rem; color: var(--color-accent); text-decoration: none; }
     .empty { color: var(--color-muted); }
+    @media (max-width: 540px) {
+      .search { flex-direction: column; }
+      .search .btn { width: 100%; }
+      .result { flex-direction: column; }
+      .result__meta { text-align: left; align-items: flex-start; margin-left: 0; width: 100%; }
+    }
   `,
 })
 export class PosProductSearchPageComponent implements OnInit {

@@ -132,7 +132,17 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
       </div>
     }
   `,
-  styles: [ADMIN_CRUD_STYLES, `.back { font-size: 0.875rem; color: var(--color-muted); text-decoration: none; } .meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem; } .section-title { font-family: var(--font-display); font-size: 1.125rem; margin: 1.5rem 0 0.75rem; } .bulk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; } .check { display: flex; gap: 0.5rem; align-items: center; font-size: 0.875rem; margin-bottom: 0.35rem; } .hint { color: var(--color-muted); font-size: 0.875rem; margin: 0; }`],
+  styles: [ADMIN_CRUD_STYLES, `
+    .back { font-size: 0.875rem; color: var(--color-muted); text-decoration: none; }
+    .meta { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; color: var(--color-muted); font-size: 0.875rem; }
+    .section-title { font-family: var(--font-display); font-size: 1.125rem; margin: 1.5rem 0 0.75rem; }
+    .bulk-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1rem 0; }
+    .check { display: flex; gap: 0.5rem; align-items: center; font-size: 0.875rem; margin-bottom: 0.35rem; }
+    .hint { color: var(--color-muted); font-size: 0.875rem; margin: 0; }
+    @media (min-width: 640px) {
+      .bulk-grid { grid-template-columns: 1fr 1fr; }
+    }
+  `],
 })
 export class AdminProductDetailPageComponent implements OnInit {
   private readonly catalog = inject(CatalogAdminApi);

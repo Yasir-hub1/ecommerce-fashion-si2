@@ -267,7 +267,7 @@ interface PosLine {
     .line p { margin: 0; font-size: 0.8125rem; color: var(--color-muted); }
     .stock { font-size: 0.75rem !important; }
     .line__qty { display: flex; gap: 0.35rem; align-items: center; }
-    .line__qty button { width: 1.75rem; height: 1.75rem; border-radius: 0.375rem; border: 1px solid var(--color-border); cursor: pointer; }
+    .line__qty button { width: 2.5rem; height: 2.5rem; border-radius: 0.375rem; border: 1px solid var(--color-border); cursor: pointer; }
     .totals { margin-top: 1rem; display: grid; gap: 0.5rem; }
     .total-due { font-size: 1.0625rem; margin: 0; }
     .warn { color: #b45309; font-size: 0.875rem; margin: 0; }
@@ -275,6 +275,10 @@ interface PosLine {
     .muted { color: var(--color-muted); font-size: 0.875rem; margin: 0; }
     .empty { color: var(--color-muted); }
     @media (max-width: 900px) { .pos__grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) {
+      .line { grid-template-columns: 1fr; gap: 0.5rem; }
+      .line__qty { justify-self: start; }
+    }
   `,
 })
 export class PosSalePageComponent implements OnInit {

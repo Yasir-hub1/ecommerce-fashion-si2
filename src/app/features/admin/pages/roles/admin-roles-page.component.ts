@@ -7,6 +7,7 @@ import type { AppPermission, RoleDefinition } from '../../../../core/models/rbac
 import { PermissionService } from '../../../../core/services/permission.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-admin-roles-page',
@@ -112,40 +113,17 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
       </div>
     }
   `,
-  styles: `
-    .page-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .subtitle { color: var(--color-muted); margin: 0.25rem 0 0; font-size: 0.875rem; }
-    .table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 0.875rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--color-border); vertical-align: top; }
-    th { background: var(--color-surface-2); }
+  styles: [
+    ADMIN_CRUD_STYLES,
+    `
     code { font-size: 0.8125rem; background: var(--color-surface-2); padding: 0.15rem 0.4rem; border-radius: 0.375rem; }
-    .actions { display: flex; gap: 0.375rem; flex-wrap: wrap; }
-    .danger { color: #b91c1c; }
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-      display: grid; place-items: center; z-index: 100; padding: 1rem;
-    }
-    .modal {
-      width: min(640px, 100%); max-height: 90dvh; overflow: auto;
-      background: var(--color-surface); border-radius: 1rem; padding: 1.25rem;
-      border: 1px solid var(--color-border);
-    }
-    .modal h2 { margin: 0 0 1rem; font-family: var(--font-display); }
-    form { display: grid; gap: 0.875rem; }
-    label { display: grid; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }
-    input, textarea {
-      border: 1px solid var(--color-border); border-radius: 0.625rem;
-      padding: 0.625rem 0.75rem; font: inherit; background: var(--color-bg);
-    }
     fieldset { border: 1px solid var(--color-border); border-radius: 0.625rem; padding: 0.75rem; margin: 0; }
     legend { padding: 0 0.375rem; font-size: 0.8125rem; font-weight: 600; }
-    .perm-grid { display: grid; gap: 0.5rem; max-height: 16rem; overflow: auto; }
+    .perm-grid { display: grid; gap: 0.5rem; max-height: min(16rem, 40dvh); overflow: auto; }
     .perm-check { display: flex; gap: 0.5rem; align-items: flex-start; font-weight: 400; cursor: pointer; }
     .perm-check small { display: block; color: var(--color-muted); font-size: 0.75rem; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
-  `,
+    `,
+  ],
 })
 export class AdminRolesPageComponent implements OnInit {
   private readonly rbacApi = inject(RbacApi);

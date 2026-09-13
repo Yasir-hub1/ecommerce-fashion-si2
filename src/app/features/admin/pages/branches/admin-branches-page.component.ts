@@ -8,6 +8,7 @@ import type { City } from '../../../../core/models/admin.models';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { MapLocationPickerComponent } from '../../../../shared/components/map-location-picker/map-location-picker.component';
 import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 type Tab = 'branches' | 'cities';
@@ -15,7 +16,7 @@ type Tab = 'branches' | 'cities';
 @Component({
   selector: 'app-admin-branches-page',
   standalone: true,
-  imports: [ReactiveFormsModule, EmptyStateComponent],
+  imports: [ReactiveFormsModule, EmptyStateComponent, MapLocationPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="page-header">
@@ -42,13 +43,30 @@ type Tab = 'branches' | 'cities';
       } @else {
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Ciudad</th><th>Horario</th><th>Prob.</th>@if (canManage()) { <th></th> }</tr></thead>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Ciudad</th>
+                <th>Ubicación</th>
+                <th>Horario</th>
+                <th>Prob.</th>
+                @if (canManage()) { <th></th> }
+              </tr>
+            </thead>
             <tbody>
               @for (b of branches(); track b.id) {
                 <tr>
                   <td>{{ b.code }}</td>
                   <td>{{ b.name }}</td>
                   <td>{{ b.city_name }}</td>
+                  <td>
+                    @if (hasCoords(b)) {
+                      <span class="coords" title="Lat, Lng">{{ formatCoords(b) }}</span>
+                    } @else {
+                      <span class="muted">Sin mapa</span>
+                    }
+                  </td>
                   <td>{{ b.opens_at }} – {{ b.closes_at }}</td>
                   <td>{{ b.fitting_rooms ?? '—' }}</td>
                   @if (canManage()) {
@@ -92,7 +110,7 @@ type Tab = 'branches' | 'cities';
 
     @if (editorOpen()) {
       <div class="modal-backdrop" (click)="closeEditor()">
-        <div class="modal" role="dialog" (click)="$event.stopPropagation()">
+        <div class="modal" [class.wide]="tab() === 'branches'" role="dialog" (click)="$event.stopPropagation()">
           @if (tab() === 'cities') {
             <h2>{{ editingCityId() ? 'Editar ciudad' : 'Nueva ciudad' }}</h2>
             <form [formGroup]="cityForm" (ngSubmit)="saveCity()">
@@ -128,6 +146,16 @@ type Tab = 'branches' | 'cities';
                 <label>Cierre <input type="time" formControlName="closes_at" /></label>
               </div>
               <label class="inline"><input type="checkbox" formControlName="is_active" /> Activa</label>
+
+              <fieldset class="map-field">
+                <legend>Ubicación en el mapa</legend>
+                <app-map-location-picker
+                  [latitude]="mapLatitude()"
+                  [longitude]="mapLongitude()"
+                  (coordinatesChange)="onMapCoordinates($event)"
+                />
+              </fieldset>
+
               <div class="modal-actions">
                 <button type="button" class="btn btn--ghost" (click)="closeEditor()">Cancelar</button>
                 <button type="submit" class="btn btn--primary" [disabled]="branchForm.invalid || saving()">Guardar</button>
@@ -138,7 +166,24 @@ type Tab = 'branches' | 'cities';
       </div>
     }
   `,
-  styles: ADMIN_CRUD_STYLES,
+  styles: [
+    ADMIN_CRUD_STYLES,
+    `
+      .coords { font-family: ui-monospace, monospace; font-size: 0.75rem; white-space: nowrap; }
+      .muted { color: var(--color-muted); font-size: 0.8125rem; }
+      .map-field {
+        margin: 0;
+        padding: 0.75rem;
+        border: 1px solid var(--color-border);
+        border-radius: 0.75rem;
+      }
+      .map-field legend {
+        padding: 0 0.375rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+      }
+    `,
+  ],
 })
 export class AdminBranchesPageComponent implements OnInit {
   private readonly orgApi = inject(OrgApi);
@@ -162,19 +207,27 @@ export class AdminBranchesPageComponent implements OnInit {
     is_active: [true],
   });
 
-  protected readonly branchForm = this.fb.nonNullable.group({
-    code: ['', Validators.required],
-    name: ['', Validators.required],
-    city: [0, Validators.required],
-    address: ['', Validators.required],
-    phone: [''],
-    opens_at: ['09:00'],
-    closes_at: ['21:00'],
-    fitting_rooms: [4],
-    is_active: [true],
+  protected readonly branchForm = this.fb.group({
+    code: this.fb.nonNullable.control('', Validators.required),
+    name: this.fb.nonNullable.control('', Validators.required),
+    city: this.fb.nonNullable.control(0, Validators.required),
+    address: this.fb.nonNullable.control('', Validators.required),
+    phone: this.fb.nonNullable.control(''),
+    opens_at: this.fb.nonNullable.control('09:00'),
+    closes_at: this.fb.nonNullable.control('21:00'),
+    fitting_rooms: this.fb.nonNullable.control(4),
+    is_active: this.fb.nonNullable.control(true),
+    latitude: this.fb.control<number | null>(null),
+    longitude: this.fb.control<number | null>(null),
   });
 
-  ngOnInit(): void { void this.load(); }
+  /** Valores numéricos para el mapa (signals derivados del form). */
+  protected readonly mapLatitude = signal<number | null>(null);
+  protected readonly mapLongitude = signal<number | null>(null);
+
+  ngOnInit(): void {
+    void this.load();
+  }
 
   openCreate(): void {
     if (this.tab() === 'cities') {
@@ -184,9 +237,20 @@ export class AdminBranchesPageComponent implements OnInit {
       this.editingBranchId.set(null);
       const cityId = this.cities()[0]?.id ?? 0;
       this.branchForm.reset({
-        code: '', name: '', city: cityId, address: '', phone: '',
-        opens_at: '09:00', closes_at: '21:00', fitting_rooms: 4, is_active: true,
+        code: '',
+        name: '',
+        city: cityId,
+        address: '',
+        phone: '',
+        opens_at: '09:00',
+        closes_at: '21:00',
+        fitting_rooms: 4,
+        is_active: true,
+        latitude: null,
+        longitude: null,
       });
+      this.mapLatitude.set(null);
+      this.mapLongitude.set(null);
     }
     this.editorOpen.set(true);
   }
@@ -200,17 +264,50 @@ export class AdminBranchesPageComponent implements OnInit {
 
   editBranch(b: Branch): void {
     this.editingBranchId.set(b.id);
+    const lat = parseCoord(b.latitude);
+    const lng = parseCoord(b.longitude);
     this.branchForm.patchValue({
-      code: b.code, name: b.name, city: b.city, address: b.address,
-      phone: b.phone ?? '', opens_at: (b.opens_at ?? '09:00:00').slice(0, 5),
+      code: b.code,
+      name: b.name,
+      city: b.city,
+      address: b.address,
+      phone: b.phone ?? '',
+      opens_at: (b.opens_at ?? '09:00:00').slice(0, 5),
       closes_at: (b.closes_at ?? '21:00:00').slice(0, 5),
-      fitting_rooms: b.fitting_rooms ?? 4, is_active: b.is_active,
+      fitting_rooms: b.fitting_rooms ?? 4,
+      is_active: b.is_active,
+      latitude: lat,
+      longitude: lng,
     });
+    this.mapLatitude.set(lat);
+    this.mapLongitude.set(lng);
     this.tab.set('branches');
     this.editorOpen.set(true);
   }
 
-  closeEditor(): void { this.editorOpen.set(false); }
+  closeEditor(): void {
+    this.editorOpen.set(false);
+  }
+
+  onMapCoordinates(coords: { latitude: number | null; longitude: number | null }): void {
+    this.branchForm.patchValue({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    });
+    this.mapLatitude.set(coords.latitude);
+    this.mapLongitude.set(coords.longitude);
+  }
+
+  hasCoords(b: Branch): boolean {
+    return parseCoord(b.latitude) !== null && parseCoord(b.longitude) !== null;
+  }
+
+  formatCoords(b: Branch): string {
+    const lat = parseCoord(b.latitude);
+    const lng = parseCoord(b.longitude);
+    if (lat === null || lng === null) return '—';
+    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  }
 
   async saveCity(): Promise<void> {
     if (this.cityForm.invalid || !this.canManage()) return;
@@ -223,8 +320,11 @@ export class AdminBranchesPageComponent implements OnInit {
       this.notifications.success('Ciudad guardada');
       this.closeEditor();
       await this.loadCities();
-    } catch { this.notifications.error('No se pudo guardar la ciudad'); }
-    finally { this.saving.set(false); }
+    } catch {
+      this.notifications.error('No se pudo guardar la ciudad');
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   async saveBranch(): Promise<void> {
@@ -232,9 +332,17 @@ export class AdminBranchesPageComponent implements OnInit {
     this.saving.set(true);
     const raw = this.branchForm.getRawValue();
     const body = {
-      ...raw,
+      code: raw.code,
+      name: raw.name,
+      city: Number(raw.city),
+      address: raw.address,
+      phone: raw.phone,
       opens_at: `${raw.opens_at}:00`,
       closes_at: `${raw.closes_at}:00`,
+      fitting_rooms: raw.fitting_rooms,
+      is_active: raw.is_active,
+      latitude: raw.latitude,
+      longitude: raw.longitude,
     };
     const id = this.editingBranchId();
     try {
@@ -243,8 +351,11 @@ export class AdminBranchesPageComponent implements OnInit {
       this.notifications.success('Sucursal guardada');
       this.closeEditor();
       await this.loadBranches();
-    } catch { this.notifications.error('No se pudo guardar la sucursal'); }
-    finally { this.saving.set(false); }
+    } catch {
+      this.notifications.error('No se pudo guardar la sucursal');
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   async removeCity(c: City): Promise<void> {
@@ -253,7 +364,9 @@ export class AdminBranchesPageComponent implements OnInit {
       await firstValueFrom(this.orgApi.deleteCity(c.id));
       this.notifications.info('Ciudad eliminada');
       await this.load();
-    } catch { this.notifications.error('No se pudo eliminar'); }
+    } catch {
+      this.notifications.error('No se pudo eliminar');
+    }
   }
 
   async removeBranch(b: Branch): Promise<void> {
@@ -262,12 +375,17 @@ export class AdminBranchesPageComponent implements OnInit {
       await firstValueFrom(this.orgApi.deleteBranch(b.id));
       this.notifications.info('Sucursal eliminada');
       await this.loadBranches();
-    } catch { this.notifications.error('No se pudo eliminar'); }
+    } catch {
+      this.notifications.error('No se pudo eliminar');
+    }
   }
 
   private async load(): Promise<void> {
-    try { await Promise.all([this.loadBranches(), this.loadCities()]); }
-    finally { this.loading.set(false); }
+    try {
+      await Promise.all([this.loadBranches(), this.loadCities()]);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   private async loadBranches(): Promise<void> {
@@ -279,4 +397,10 @@ export class AdminBranchesPageComponent implements OnInit {
     const res = await firstValueFrom(this.orgApi.listCities());
     this.cities.set(res.results);
   }
+}
+
+function parseCoord(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(n) ? n : null;
 }

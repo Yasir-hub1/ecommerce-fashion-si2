@@ -73,17 +73,22 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .price { font-weight: 700; margin: 0; }
     .qty { display: flex; align-items: center; gap: 0.5rem; }
     .qty button {
-      width: 2rem; height: 2rem; border-radius: 0.5rem; border: 1px solid var(--color-border);
+      width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border);
       background: var(--color-surface-2); cursor: pointer;
     }
-    .remove { background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 0.875rem; }
+    .remove { background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 0.875rem; min-height: 2.5rem; }
     .summary {
       position: sticky; top: 5rem; padding: 1rem; border-radius: 0.875rem;
       border: 1px solid var(--color-border); background: var(--color-surface);
     }
     .summary h2 { margin: 0 0 0.75rem; font-size: 1.125rem; }
     .total { font-size: 1.125rem; font-weight: 700; margin: 1rem 0; }
-    @media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .cart-layout { grid-template-columns: 1fr; }
+      .summary { position: static; }
+      .item { grid-template-columns: 1fr; gap: 0.75rem; }
+      .qty, .remove { justify-self: start; }
+    }
   `,
 })
 export class CartPageComponent implements OnInit {

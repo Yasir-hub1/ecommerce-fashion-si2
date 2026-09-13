@@ -56,8 +56,8 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   `,
   styles: `
     .back { color: var(--color-muted); font-size: 0.875rem; text-decoration: none; }
-    .head { display: flex; justify-content: space-between; align-items: flex-start; margin: 0.75rem 0 1rem; }
-    h1 { font-family: var(--font-display); margin: 0; font-size: 1.5rem; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; margin: 0.75rem 0 1rem; gap: 0.75rem; flex-wrap: wrap; }
+    h1 { font-family: var(--font-display); margin: 0; font-size: clamp(1.25rem, 4vw, 1.5rem); }
     .meta { color: var(--color-muted); margin: 0.25rem 0 0; font-size: 0.875rem; }
     .status { font-size: 0.8125rem; padding: 0.25rem 0.625rem; border-radius: 999px; background: var(--color-surface-2); }
     .card {
@@ -71,7 +71,11 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
     .line p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
     .total { font-weight: 600; }
-    .grand { display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 1.125rem; }
+    .grand { display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 1.125rem; gap: 0.5rem; }
+    @media (max-width: 640px) {
+      .line { grid-template-columns: 1fr auto; }
+      .line .total { grid-column: 2; }
+    }
   `,
 })
 export class OrderDetailPageComponent implements OnInit {

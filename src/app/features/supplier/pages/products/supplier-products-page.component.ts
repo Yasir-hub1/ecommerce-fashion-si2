@@ -7,6 +7,7 @@ import type { ProductListItem } from '../../../../core/models/api.models';
 import { StaffContextService } from '../../../../core/services/staff-context.service';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-supplier-products-page',
@@ -26,22 +27,12 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
             <a [routerLink]="['/ecommerce/producto', p.id]">{{ p.name }}</a>
             <p>{{ p.collection_name }} · {{ p.brand_name }}</p>
           </div>
-          <span>{{ p.base_price | price }}</span>
+          <span class="price">{{ p.base_price | price }}</span>
         </article>
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .hint { color: var(--color-muted); margin: 0.25rem 0 1rem; font-size: 0.875rem; }
-    .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
-      background: var(--color-surface); margin-bottom: 0.5rem;
-    }
-    a { color: var(--color-accent); text-decoration: none; font-weight: 600; }
-    p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class SupplierProductsPageComponent implements OnInit {
   private readonly catalog = inject(CatalogAdminApi);

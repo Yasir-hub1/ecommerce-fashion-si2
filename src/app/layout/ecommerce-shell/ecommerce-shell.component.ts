@@ -20,20 +20,6 @@ import { CartStore } from '../../core/services/cart.store';
             <span class="brand__name">{{ shell.label }}</span>
           </a>
 
-          <nav class="nav" aria-label="E-commerce">
-            @for (item of nav; track item.path) {
-              @if (item.path.includes('cuenta') ? auth.isAuthenticated() && auth.isCustomer() : true) {
-                <a
-                  [routerLink]="item.path"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                >
-                  {{ item.label }}
-                </a>
-              }
-            }
-          </nav>
-
           <div class="header__actions">
             @if (branchContext.branches().length) {
               <label class="branch-select">
@@ -60,7 +46,7 @@ import { CartStore } from '../../core/services/cart.store';
 
             @if (auth.isAuthenticated()) {
               @if (auth.isStaff()) {
-                <a routerLink="/admin" class="btn btn--ghost">Administración</a>
+                <a routerLink="/admin" class="btn btn--ghost header__desktop-only">Administración</a>
               }
               @if (auth.isCustomer()) {
                 <a routerLink="/ecommerce/cuenta" class="user-chip">{{ auth.user()?.first_name }}</a>
@@ -68,10 +54,30 @@ import { CartStore } from '../../core/services/cart.store';
               <button type="button" class="btn btn--ghost" (click)="auth.logout()">Salir</button>
             } @else {
               <a routerLink="/auth/login" class="btn btn--ghost">Entrar</a>
-              <a routerLink="/auth/registro" class="btn btn--primary">Registrarse</a>
+              <a routerLink="/auth/registro" class="btn btn--primary header__desktop-only">Registrarse</a>
             }
           </div>
         </div>
+
+        <nav class="nav" aria-label="E-commerce">
+          @for (item of nav; track item.path) {
+            @if (item.path.includes('cuenta') ? auth.isAuthenticated() && auth.isCustomer() : true) {
+              <a
+                [routerLink]="item.path"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+              >
+                {{ item.label }}
+              </a>
+            }
+          }
+          @if (auth.isStaff()) {
+            <a routerLink="/admin" class="header__mobile-only">Administración</a>
+          }
+          @if (!auth.isAuthenticated()) {
+            <a routerLink="/auth/registro" class="header__mobile-only">Registrarse</a>
+          }
+        </nav>
       </header>
 
       <main class="main"><router-outlet /></main>
@@ -82,7 +88,7 @@ import { CartStore } from '../../core/services/cart.store';
     </div>
   `,
   styles: `
-    .shell { min-height: 100dvh; display: flex; flex-direction: column; }
+    .shell { min-height: 100dvh; display: flex; flex-direction: column; overflow-x: clip; }
     .header {
       position: sticky; top: 0; z-index: 50;
       backdrop-filter: blur(12px);
@@ -90,30 +96,48 @@ import { CartStore } from '../../core/services/cart.store';
       border-bottom: 1px solid var(--color-border);
     }
     .header__inner {
-      max-width: 1200px; margin: 0 auto; padding: 0.875rem 1.25rem;
-      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      max-width: 1200px; margin: 0 auto;
+      padding: 0.75rem var(--page-pad-x, 1.25rem) 0.5rem;
+      display: flex; align-items: center; gap: 0.75rem;
     }
-    .brand { display: flex; align-items: center; gap: 0.625rem; text-decoration: none; color: inherit; }
+    .brand {
+      display: flex; align-items: center; gap: 0.625rem;
+      text-decoration: none; color: inherit; min-width: 0;
+    }
     .brand__mark {
-      width: 2.25rem; height: 2.25rem; border-radius: 999px;
+      width: 2.25rem; height: 2.25rem; border-radius: 999px; flex-shrink: 0;
       display: grid; place-items: center; font-weight: 700; font-size: 0.75rem;
       background: var(--color-accent); color: white;
     }
-    .brand__name { font-family: var(--font-display); font-size: 1.125rem; }
-    .nav { display: flex; gap: 1rem; flex: 1; flex-wrap: wrap; }
-    .nav a {
-      text-decoration: none; color: var(--color-muted); font-size: 0.9rem;
-      padding: 0.25rem 0; border-bottom: 2px solid transparent;
+    .brand__name {
+      font-family: var(--font-display); font-size: 1.125rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .nav a.active, .nav a:hover { color: var(--color-text); border-bottom-color: var(--color-accent); }
-    .header__actions { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; flex-wrap: wrap; }
+    .nav {
+      display: flex; gap: 0.25rem;
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 var(--page-pad-x, 1.25rem) 0.65rem;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .nav a {
+      text-decoration: none; color: var(--color-muted); font-size: 0.875rem;
+      padding: 0.45rem 0.7rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+    }
+    .nav a.active, .nav a:hover {
+      color: var(--color-text); background: var(--color-surface-2);
+    }
+    .header__actions {
+      display: flex; align-items: center; gap: 0.4rem; margin-left: auto; flex-shrink: 0;
+    }
     .branch-select select {
       border: 1px solid var(--color-border); border-radius: 999px;
-      padding: 0.4rem 0.875rem; background: var(--color-surface); font-size: 0.8125rem; max-width: 14rem;
+      padding: 0.4rem 0.75rem; background: var(--color-surface);
+      font-size: 0.8125rem; max-width: 11rem;
     }
     .cart-btn {
       position: relative; text-decoration: none; font-size: 1.125rem;
-      width: 2.25rem; height: 2.25rem; display: grid; place-items: center;
+      width: 2.5rem; height: 2.5rem; display: grid; place-items: center;
       border-radius: 999px; background: var(--color-surface-2);
     }
     .cart-btn__badge {
@@ -124,16 +148,38 @@ import { CartStore } from '../../core/services/cart.store';
     }
     .user-chip {
       padding: 0.35rem 0.75rem; border-radius: 999px;
-      background: var(--color-surface-2); text-decoration: none; color: inherit; font-size: 0.8125rem;
+      background: var(--color-surface-2); text-decoration: none; color: inherit;
+      font-size: 0.8125rem; max-width: 7rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .main { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+    .header__mobile-only { display: none; }
+    .main {
+      flex: 1; max-width: 1200px; width: 100%; margin: 0 auto;
+      padding: 1.25rem var(--page-pad-x, 1.25rem) 3rem;
+      min-width: 0;
+    }
     .footer {
-      border-top: 1px solid var(--color-border); padding: 1.25rem;
+      border-top: 1px solid var(--color-border);
+      padding: 1.25rem var(--page-pad-x, 1.25rem);
       text-align: center; color: var(--color-muted); font-size: 0.8125rem;
     }
     .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
       overflow: hidden; clip: rect(0,0,0,0); border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .brand__name { font-size: 1rem; }
+      .branch-select select { max-width: 8.5rem; font-size: 0.75rem; }
+      .header__desktop-only { display: none; }
+      .header__mobile-only { display: inline-flex; }
+      .header__actions .btn { padding: 0.45rem 0.7rem; min-height: 2.5rem; }
+      .main { padding: 1rem var(--page-pad-x, 1rem) 2.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .branch-select { display: none; }
+      .user-chip { display: none; }
     }
   `,
 })

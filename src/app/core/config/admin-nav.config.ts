@@ -20,6 +20,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: 'Roles', path: '/admin/roles', permissions: ['rbac.roles.view'] },
   { label: 'Permisos', path: '/admin/permisos', permissions: ['rbac.permissions.view'] },
   { label: 'Usuarios', path: '/admin/usuarios', permissions: ['accounts.users.view'] },
+  { label: 'Bitácora', path: '/admin/bitacora', permissions: ['bitacora.view'] },
   { label: 'Sucursales', path: '/admin/sucursales', permissions: ['branches.view'] },
   { label: 'Productos', path: '/admin/productos', permissions: ['catalog.products.view'] },
   { label: 'Marcas', path: '/admin/marcas', permissions: ['catalog.products.view'] },

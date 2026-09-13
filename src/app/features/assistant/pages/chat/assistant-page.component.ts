@@ -40,8 +40,14 @@ import { NotificationService } from '../../../../core/services/notification.serv
     .bubble--user { justify-self: end; background: color-mix(in srgb, var(--color-accent) 12%, white); }
     .typing { color: var(--color-muted); font-size: 0.875rem; margin: 0; }
     .input-row { display: flex; gap: 0.5rem; }
-    input { flex: 1; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit; }
+    input { flex: 1; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit; min-height: 2.75rem; min-width: 0; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    @media (max-width: 640px) {
+      .bubble { max-width: 95%; }
+      .input-row { flex-direction: column; }
+      .input-row .btn { width: 100%; }
+      .chat { max-height: 55dvh; min-height: 12rem; }
+    }
   `,
 })
 export class AssistantPageComponent {

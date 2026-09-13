@@ -88,12 +88,12 @@ const PAYMENT_LABELS: Record<string, string> = {
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
+    .page-title { font-family: var(--font-display); margin: 0 0 1rem; font-size: clamp(1.25rem, 4vw, 1.75rem); }
     .section-title { font-size: 1rem; margin: 1.5rem 0 0.75rem; font-family: var(--font-display); }
     .muted { color: var(--color-muted); }
     .warn { color: #b45309; margin: 0 0 1rem; }
     .summary {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 0.75rem; margin-bottom: 1rem;
     }
     .summary__card {
       border: 1px solid var(--color-border); border-radius: 0.75rem; padding: 0.875rem 1rem;
@@ -104,18 +104,22 @@ const PAYMENT_LABELS: Record<string, string> = {
     .methods { margin-bottom: 0.5rem; }
     .methods h2 { font-size: 0.9375rem; margin: 0 0 0.5rem; }
     .method-row {
-      display: flex; justify-content: space-between; padding: 0.5rem 0;
-      border-bottom: 1px solid var(--color-border); font-size: 0.875rem;
+      display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border); font-size: 0.875rem; flex-wrap: wrap;
     }
     .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
+      display: flex; justify-content: space-between; gap: 0.75rem; align-items: center;
       padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
-      background: var(--color-surface); margin-bottom: 0.5rem;
+      background: var(--color-surface); margin-bottom: 0.5rem; flex-wrap: wrap;
     }
     .row p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
     .customer { font-style: italic; }
-    .row__actions { display: flex; align-items: center; gap: 0.75rem; }
-    .btn--sm { font-size: 0.8125rem; padding: 0.25rem 0.625rem; }
+    .row__actions { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; }
+    .btn--sm { font-size: 0.8125rem; padding: 0.25rem 0.625rem; min-height: 2.25rem; }
+    @media (max-width: 540px) {
+      .row { flex-direction: column; align-items: stretch; }
+      .row__actions { margin-left: 0; justify-content: space-between; width: 100%; }
+    }
   `,
 })
 export class PosSalesTodayPageComponent implements OnInit {

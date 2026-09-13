@@ -38,9 +38,16 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     </div>
   `,
   styles: `
-    .result { max-width: 28rem; margin: 2rem auto; text-align: center; display: grid; gap: 0.75rem; }
+    .result {
+      max-width: 28rem; margin: 2rem auto; text-align: center; display: grid; gap: 0.75rem;
+      padding-inline: 0.5rem; width: 100%;
+    }
     .success, .pending { font-size: 2.5rem; }
-    h1 { font-family: var(--font-display); margin: 0; }
+    h1 { font-family: var(--font-display); margin: 0; font-size: clamp(1.25rem, 4vw, 1.75rem); }
+    .result .btn { width: 100%; justify-content: center; }
+    @media (min-width: 480px) {
+      .result .btn { width: auto; justify-self: center; min-width: 12rem; }
+    }
   `,
 })
 export class CheckoutResultPageComponent implements OnInit {

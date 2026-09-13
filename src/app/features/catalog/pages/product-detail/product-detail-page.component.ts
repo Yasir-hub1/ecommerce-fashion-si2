@@ -174,7 +174,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .thumb img { width: 100%; height: 100%; object-fit: cover; }
     .thumb--active { border-color: var(--color-accent); }
     .meta { color: var(--color-muted); margin: 0 0 0.25rem; font-size: 0.875rem; }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 2rem; }
+    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: clamp(1.5rem, 5vw, 2rem); }
     .price { font-size: 1.25rem; font-weight: 700; margin: 0 0 1rem; }
     .desc { color: var(--color-muted); line-height: 1.7; margin-bottom: 1.5rem; }
     .selector { margin-bottom: 1rem; }
@@ -183,15 +183,17 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .chip {
       display: inline-flex; align-items: center; gap: 0.375rem;
       border: 1px solid var(--color-border); background: var(--color-surface);
-      border-radius: 999px; padding: 0.45rem 0.75rem; cursor: pointer; font: inherit;
+      border-radius: 999px; padding: 0.55rem 0.85rem; cursor: pointer; font: inherit;
+      min-height: 2.75rem;
     }
-    .chip--size { min-width: 2.5rem; justify-content: center; border-radius: 0.5rem; }
+    .chip--size { min-width: 2.75rem; justify-content: center; border-radius: 0.5rem; }
     .chip--active { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
     .chip--disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
     .swatch { width: 0.875rem; height: 0.875rem; border-radius: 999px; border: 1px solid rgba(0,0,0,0.1); }
     .availability { font-size: 0.875rem; margin: 0.5rem 0 1rem; }
     .availability--low { color: #b45309; font-weight: 600; }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+    .actions .btn { flex: 1 1 auto; min-width: min(100%, 10rem); }
     .reservation-box {
       margin-top: 1rem; padding: 1rem; border-radius: 0.875rem;
       border: 1px dashed var(--color-border); background: var(--color-surface-2);
@@ -201,8 +203,9 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     .reservation-box label { display: grid; gap: 0.375rem; font-size: 0.875rem; margin-bottom: 0.75rem; }
     .reservation-box input {
       border: 1px solid var(--color-border); border-radius: 0.625rem; padding: 0.625rem; font: inherit;
+      width: 100%; min-height: 2.75rem;
     }
-    @media (max-width: 900px) { .detail__grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .detail__grid { grid-template-columns: 1fr; gap: 1.25rem; } }
   `,
 })
 export class ProductDetailPageComponent {

@@ -59,22 +59,26 @@ import { NotificationService } from '../../../../core/services/notification.serv
   `,
   styles: `
     .auth-card {
-      max-width: 32rem; margin: 2rem auto; padding: 2rem;
+      max-width: 32rem; width: 100%; margin: 1.5rem auto; padding: 1.5rem;
       background: var(--color-surface); border: 1px solid var(--color-border);
       border-radius: 1rem; box-shadow: var(--shadow-card);
     }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 1.75rem; }
+    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: clamp(1.5rem, 5vw, 1.75rem); }
     .subtitle { color: var(--color-muted); margin: 0 0 1.5rem; }
     form { display: grid; gap: 1rem; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
     label { display: grid; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }
     input {
       border: 1px solid var(--color-border); border-radius: 0.625rem;
       padding: 0.75rem 0.875rem; font: inherit; background: var(--color-bg);
+      width: 100%; min-height: 2.75rem;
     }
     .error { color: #b91c1c; font-size: 0.875rem; margin: 0; }
     .footer-link { margin-top: 1.25rem; text-align: center; color: var(--color-muted); font-size: 0.875rem; }
-    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) {
+      .auth-card { margin: 1rem; padding: 1.25rem; width: auto; }
+    }
   `,
 })
 export class RegisterPageComponent {

@@ -15,6 +15,66 @@ export interface ReportSummary {
   top_products: { product_name: string; units_sold: number; revenue: string }[];
 }
 
+export interface DashboardKpis {
+  readonly total_sales: string;
+  readonly total_sales_delta: number;
+  readonly order_count: number;
+  readonly order_count_delta: number;
+  readonly reservation_count: number;
+  readonly reservation_count_delta: number;
+  readonly conversion_rate: number;
+  readonly conversion_rate_delta: number;
+  readonly low_stock_count: number;
+  readonly catalog_products: number;
+  readonly units_on_hand: number;
+  readonly units_reserved: number;
+}
+
+export interface DashboardPayload {
+  readonly period: { readonly days: number; readonly from: string; readonly to: string; readonly label: string };
+  readonly kpis: DashboardKpis;
+  readonly sales_by_day: ReadonlyArray<{ readonly date: string; readonly total: string; readonly count: number }>;
+  readonly sales_by_channel: ReadonlyArray<{
+    readonly channel: string;
+    readonly label: string;
+    readonly total: string;
+    readonly count: number;
+  }>;
+  readonly sales_by_branch: ReadonlyArray<{
+    readonly branch_id: number;
+    readonly branch_name: string;
+    readonly total: string;
+    readonly count: number;
+  }>;
+  readonly reservations_by_status: ReadonlyArray<{
+    readonly status: string;
+    readonly label: string;
+    readonly count: number;
+  }>;
+  readonly top_products: ReadonlyArray<{
+    readonly product_name: string;
+    readonly units_sold: number;
+    readonly revenue: string;
+  }>;
+  readonly low_stock_items: ReadonlyArray<{
+    readonly branch_code: string;
+    readonly sku: string;
+    readonly product_name: string;
+    readonly on_hand: number;
+    readonly min_threshold: number;
+  }>;
+  readonly recent_orders: ReadonlyArray<{
+    readonly id: number;
+    readonly code: string;
+    readonly branch_name: string;
+    readonly channel: string;
+    readonly channel_display: string;
+    readonly status: string;
+    readonly grand_total: string;
+    readonly paid_at: string;
+  }>;
+}
+
 export interface ReportRequest {
   id: number;
   report_type: string;
@@ -31,6 +91,10 @@ export class ReportsApi {
 
   summary(params?: Record<string, string | number>): Observable<ReportSummary> {
     return this.http.get<ReportSummary>(`${this.base}/summary/`, { params: toHttpParams(params) });
+  }
+
+  dashboard(params?: Record<string, string | number>): Observable<DashboardPayload> {
+    return this.http.get<DashboardPayload>(`${this.base}/dashboard/`, { params: toHttpParams(params) });
   }
 
   list(params?: Record<string, string | number>): Observable<PaginatedResponse<ReportRequest>> {

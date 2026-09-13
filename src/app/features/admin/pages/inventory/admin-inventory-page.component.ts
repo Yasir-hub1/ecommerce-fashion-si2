@@ -172,8 +172,14 @@ type Tab = 'stock' | 'movements' | 'alerts';
     ADMIN_CRUD_STYLES,
     `
     .toolbar { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; margin-bottom: 1rem; }
-    .toolbar label { display: grid; gap: 0.375rem; font-size: 0.875rem; }
+    .toolbar label { display: grid; gap: 0.375rem; font-size: 0.875rem; min-width: min(100%, 12rem); }
+    .toolbar select { width: 100%; min-height: 2.75rem; }
     .low { background: color-mix(in srgb, #b45309 8%, transparent); }
+    @media (max-width: 640px) {
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar label { width: 100%; }
+      .tabs { width: 100%; }
+    }
     `,
   ],
 })

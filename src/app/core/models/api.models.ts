@@ -50,6 +50,8 @@ export interface Branch {
   city_name: string;
   department?: string;
   address: string;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
   phone?: string;
   email?: string;
   opens_at?: string;

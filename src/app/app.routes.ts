@@ -143,6 +143,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'bitacora',
+        canActivate: [permissionGuard('bitacora.view')],
+        loadComponent: () =>
+          import('./features/admin/pages/bitacora/admin-bitacora-page.component').then(
+            (m) => m.AdminBitacoraPageComponent,
+          ),
+      },
+      {
         path: 'sucursales',
         canActivate: [permissionGuard('branches.view')],
         loadComponent: () =>

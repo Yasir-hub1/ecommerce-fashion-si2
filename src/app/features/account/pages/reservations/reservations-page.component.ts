@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { ReservationsApi } from '../../../../core/api/reservations.api';
 import type { ReservationListItem } from '../../../../core/models/api.models';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-reservations-page',
@@ -40,18 +41,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
-    .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
-      background: var(--color-surface); margin-bottom: 0.75rem;
-    }
-    .meta, .expire { margin: 0.25rem 0 0; color: var(--color-muted); font-size: 0.875rem; }
-    .expire { color: #b45309; }
-    .right { text-align: right; display: grid; gap: 0.5rem; justify-items: end; }
-    .status { font-size: 0.8125rem; }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class ReservationsPageComponent implements OnInit {
   private readonly reservationsApi = inject(ReservationsApi);

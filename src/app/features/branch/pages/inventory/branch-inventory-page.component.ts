@@ -8,6 +8,7 @@ import { BranchContextService } from '../../../../core/services/branch-context.s
 import type { ProductListItem } from '../../../../core/models/api.models';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
+import { LIST_ROW_STYLES } from '../../../../shared/styles/admin-crud.styles';
 
 @Component({
   selector: 'app-branch-inventory-page',
@@ -36,19 +37,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
       }
     }
   `,
-  styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .subtitle { color: var(--color-muted); margin: 0.25rem 0 1rem; }
-    .row {
-      display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
-      background: var(--color-surface); margin-bottom: 0.5rem;
-    }
-    a { color: var(--color-accent); text-decoration: none; font-weight: 600; }
-    p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
-    .right { text-align: right; display: grid; gap: 0.25rem; }
-    .stock { font-weight: 700; }
-  `,
+  styles: LIST_ROW_STYLES,
 })
 export class BranchInventoryPageComponent {
   private readonly catalogApi = inject(CatalogApi);

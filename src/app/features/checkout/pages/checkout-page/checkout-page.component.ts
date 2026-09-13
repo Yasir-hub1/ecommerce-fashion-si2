@@ -50,13 +50,14 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
-    .checkout { max-width: 32rem; margin: 0 auto; }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; }
-    .total { font-size: 1.25rem; font-weight: 700; }
+    .checkout { max-width: 32rem; margin: 0 auto; width: 100%; }
+    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: clamp(1.25rem, 4vw, 1.75rem); word-break: break-word; }
+    .total { font-size: clamp(1.1rem, 3vw, 1.25rem); font-weight: 700; }
     .hint { color: var(--color-muted); margin-bottom: 1rem; }
     .payment-box {
       min-height: 8rem; padding: 1rem; border: 1px solid var(--color-border);
       border-radius: 0.875rem; background: var(--color-surface); margin-bottom: 1rem;
+      overflow-x: auto;
     }
   `,
 })

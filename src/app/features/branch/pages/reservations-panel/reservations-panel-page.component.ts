@@ -51,17 +51,21 @@ const NEXT_STATUS: Record<string, string> = {
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
+    .page-title { font-family: var(--font-display); margin: 0; font-size: clamp(1.25rem, 4vw, 1.75rem); }
     .subtitle { color: var(--color-muted); margin: 0 0 1.25rem; }
     .card {
       padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
       background: var(--color-surface); margin-bottom: 0.75rem;
     }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem; flex-wrap: wrap; }
     .badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 999px; background: var(--color-surface-2); }
     .time { margin: 0.25rem 0; font-weight: 600; }
     .expire { color: #b45309; font-size: 0.8125rem; margin: 0 0 0.75rem; }
     .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    @media (max-width: 540px) {
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+    }
   `,
 })
 export class ReservationsPanelPageComponent implements OnInit {
