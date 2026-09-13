@@ -13,7 +13,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
   imports: [ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="page-title">Mi cuenta</h1>
+    <h1 class="page-title">Cuenta</h1>
 
     @if (auth.profile(); as profile) {
       <section class="card">
@@ -43,27 +43,29 @@ import { NotificationService } from '../../../../core/services/notification.serv
       </section>
 
       <nav class="links">
-        <a routerLink="/ecommerce/cuenta/pedidos">Mis compras</a>
-        <a routerLink="/ecommerce/cuenta/reservas">Mis reservas</a>
-        <a routerLink="/ecommerce/reserva">Nueva reserva multi-prenda</a>
+        <a routerLink="/ecommerce/cuenta/pedidos">Pedidos</a>
+        <a routerLink="/ecommerce/cuenta/reservas">Reservas</a>
+        <a routerLink="/ecommerce/reserva">Nueva reserva de probador</a>
       </nav>
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
+    .page-title { margin: 0 0 1rem; }
     .card {
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
+      padding: 1.1rem; border: 1px solid var(--color-border);
       background: var(--color-surface); margin-bottom: 1rem;
+      border-top: 3px solid var(--color-ink);
     }
-    h2 { font-size: 1rem; margin: 0 0 0.75rem; }
+    h2 { font-size: 1rem; margin: 0 0 0.75rem; font-family: var(--font-display); letter-spacing: -0.02em; }
     label { display: grid; gap: 0.35rem; margin-bottom: 0.75rem; font-size: 0.875rem; font-weight: 500; }
     input {
-      padding: 0.625rem 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem;
+      padding: 0.625rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
       font: inherit; background: var(--color-bg);
     }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .links { display: grid; gap: 0.5rem; margin-top: 1rem; }
-    .links a { color: var(--color-accent); }
+    .links a { color: var(--color-accent); font-weight: 600; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
     @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
   `,
 })

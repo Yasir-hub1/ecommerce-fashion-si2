@@ -13,34 +13,41 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   imports: [RouterLink, PricePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="result">
+    <div class="result anim-rise">
       @if (loading()) {
-        <p>Verificando estado del pago…</p>
+        <p class="muted">Verificando estado del pago…</p>
       } @else if (order()) {
         @if (order()!.status === 'PAID') {
-          <div class="success">✓</div>
-          <h1>¡Pago confirmado!</h1>
+          <div class="mark mark--ok" aria-hidden="true"></div>
+          <h1>Pago confirmado</h1>
           <p>Orden <strong>{{ order()!.code }}</strong> · {{ order()!.grand_total | price }}</p>
         } @else {
-          <div class="pending">⏳</div>
+          <div class="mark mark--wait" aria-hidden="true"></div>
           <h1>Pago en proceso</h1>
           <p>
-            Estamos confirmando tu pago. Si acabas de pagar, espera unos segundos y recarga.
+            Estamos confirmando tu pago. Si acabas de pagar, espera unos segundos y reintenta.
           </p>
           <button type="button" class="btn btn--secondary" (click)="reload()">Reintentar</button>
         }
-        <a routerLink="/ecommerce/cuenta/pedidos" class="btn btn--primary">Ver mis compras</a>
-        <a routerLink="/ecommerce" class="btn btn--ghost">Seguir comprando</a>
+        <a routerLink="/ecommerce/cuenta/pedidos" class="btn btn--primary">Ver pedidos</a>
+        <a routerLink="/ecommerce" class="btn btn--ghost">Seguir explorando</a>
       } @else {
         <h1>No encontramos la orden</h1>
-        <a routerLink="/ecommerce" class="btn btn--primary">Volver al catálogo</a>
+        <a routerLink="/ecommerce" class="btn btn--primary">Volver a explorar</a>
       }
     </div>
   `,
   styles: `
-    .result { max-width: 28rem; margin: 2rem auto; text-align: center; display: grid; gap: 0.75rem; }
-    .success, .pending { font-size: 2.5rem; }
-    h1 { font-family: var(--font-display); margin: 0; }
+    .result { max-width: 28rem; margin: 2rem auto; text-align: center; display: grid; gap: 0.75rem; justify-items: center; }
+    .muted { color: var(--color-muted); }
+    .mark {
+      width: 3rem; height: 3rem;
+      border: 3px solid var(--color-ink);
+      transform: rotate(12deg);
+    }
+    .mark--ok { border-color: var(--color-teal); background: var(--color-teal-soft); }
+    .mark--wait { border-color: var(--color-warn); background: var(--color-warn-soft); }
+    h1 { font-family: var(--font-display); margin: 0; letter-spacing: -0.03em; }
   `,
 })
 export class CheckoutResultPageComponent implements OnInit {

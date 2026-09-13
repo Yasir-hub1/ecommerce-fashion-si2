@@ -21,8 +21,8 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     </p>
 
     @if (!reservationCart.lines().length) {
-      <app-empty-state icon="👗" title="Sin prendas en la reserva" description="Agrega productos desde el catálogo.">
-        <a routerLink="/ecommerce" class="btn btn--primary">Ir al catálogo</a>
+      <app-empty-state icon="" title="Sin prendas en la reserva" description="Agrega productos desde Explorar.">
+        <a routerLink="/ecommerce" class="btn btn--primary">Explorar</a>
       </app-empty-state>
     } @else {
       <div class="layout">
@@ -61,23 +61,27 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
+    .page-title { margin: 0; }
     .subtitle { color: var(--color-muted); margin: 0.25rem 0 1.25rem; }
     .layout { display: grid; grid-template-columns: 1fr 18rem; gap: 1.25rem; align-items: start; }
     .row {
       display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center;
-      padding: 0.875rem 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
+      padding: 0.875rem 1rem; border: 1px solid var(--color-border);
       background: var(--color-surface); margin-bottom: 0.5rem;
     }
     p { margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
     .qty { display: flex; gap: 0.35rem; align-items: center; }
-    .qty button { width: 1.75rem; height: 1.75rem; border: 1px solid var(--color-border); border-radius: 0.375rem; }
-    .remove { border: none; background: none; color: #b91c1c; cursor: pointer; font-size: 0.8125rem; }
-    .panel {
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
-      background: var(--color-surface); display: grid; gap: 0.75rem;
+    .qty button {
+      width: 1.75rem; height: 1.75rem; border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm); background: var(--color-surface-2); cursor: pointer;
     }
-    h2 { margin: 0; font-size: 1rem; }
+    .remove { border: none; background: none; color: var(--color-danger); cursor: pointer; font-size: 0.8125rem; font-weight: 600; }
+    .panel {
+      padding: 1rem; border: 1px solid var(--color-border);
+      background: var(--color-surface); display: grid; gap: 0.75rem;
+      border-top: 3px solid var(--color-accent);
+    }
+    h2 { margin: 0; font-size: 1rem; font-family: var(--font-display); }
     label { display: grid; gap: 0.35rem; font-size: 0.875rem; font-weight: 500; }
     input, textarea {
       padding: 0.625rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit;

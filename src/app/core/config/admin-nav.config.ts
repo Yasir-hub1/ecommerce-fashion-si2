@@ -4,46 +4,57 @@ export interface AdminNavItem {
   exact?: boolean;
   permissions?: string[];
   roles?: string[];
+  /** Sección visual del sidebar (solo UI). */
+  group?: string;
 }
 
 export const ECOMMERCE_NAV: AdminNavItem[] = [
-  { label: 'Catálogo', path: '/ecommerce', exact: true },
-  { label: 'Reservar prendas', path: '/ecommerce/reserva' },
-  { label: 'Mis reservas', path: '/ecommerce/cuenta/reservas' },
-  { label: 'Mis compras', path: '/ecommerce/cuenta/pedidos' },
-  { label: 'Asistente IA', path: '/ecommerce/asistente' },
+  { label: 'Explorar', path: '/ecommerce', exact: true },
+  { label: 'Probador', path: '/ecommerce/reserva' },
+  { label: 'Reservas', path: '/ecommerce/cuenta/reservas' },
+  { label: 'Pedidos', path: '/ecommerce/cuenta/pedidos' },
+  { label: 'Estilista', path: '/ecommerce/asistente' },
 ];
 
 /** Menú del backoffice — visible según permisos RBAC del usuario */
 export const ADMIN_NAV: AdminNavItem[] = [
-  { label: 'Panel', path: '/admin', exact: true },
-  { label: 'Roles', path: '/admin/roles', permissions: ['rbac.roles.view'] },
-  { label: 'Permisos', path: '/admin/permisos', permissions: ['rbac.permissions.view'] },
-  { label: 'Usuarios', path: '/admin/usuarios', permissions: ['accounts.users.view'] },
-  { label: 'Sucursales', path: '/admin/sucursales', permissions: ['branches.view'] },
-  { label: 'Productos', path: '/admin/productos', permissions: ['catalog.products.view'] },
-  { label: 'Marcas', path: '/admin/marcas', permissions: ['catalog.products.view'] },
-  { label: 'Categorías', path: '/admin/categorias', permissions: ['catalog.products.view'] },
-  { label: 'Tallas y colores', path: '/admin/atributos', permissions: ['catalog.products.view'] },
-  { label: 'Temporadas', path: '/admin/temporadas', permissions: ['catalog.products.view'] },
-  { label: 'Colecciones', path: '/admin/colecciones', permissions: ['catalog.products.view'] },
-  { label: 'Promociones', path: '/admin/promociones', permissions: ['promotions.view'] },
-  { label: 'Proveedores', path: '/admin/proveedores', permissions: ['suppliers.view'] },
-  { label: 'Portal proveedor', path: '/admin/portal-proveedor', roles: ['SUPPLIER'] },
-  { label: 'Inventario', path: '/admin/inventario', permissions: ['inventory.stock.view'] },
-  { label: 'Reservas', path: '/admin/reservas', permissions: ['reservations.view'] },
-  { label: 'Reservas del día', path: '/admin/reservas/dia', permissions: ['reservations.view'], roles: ['BRANCH_MANAGER', 'CASHIER'] },
-  { label: 'Órdenes', path: '/admin/ordenes', permissions: ['orders.view'] },
-  { label: 'Punto de venta', path: '/admin/pos', permissions: ['pos.sales'] },
-  { label: 'Reportes', path: '/admin/reportes', permissions: ['reports.view'] },
+  { label: 'Panel', path: '/admin', exact: true, group: 'Vista' },
+  { label: 'Roles', path: '/admin/roles', permissions: ['rbac.roles.view'], group: 'Personas' },
+  { label: 'Permisos', path: '/admin/permisos', permissions: ['rbac.permissions.view'], group: 'Personas' },
+  { label: 'Usuarios', path: '/admin/usuarios', permissions: ['accounts.users.view'], group: 'Personas' },
+  { label: 'Sucursales', path: '/admin/sucursales', permissions: ['branches.view'], group: 'Red' },
+  { label: 'Productos', path: '/admin/productos', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Marcas', path: '/admin/marcas', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Categorías', path: '/admin/categorias', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Tallas y colores', path: '/admin/atributos', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Temporadas', path: '/admin/temporadas', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Colecciones', path: '/admin/colecciones', permissions: ['catalog.products.view'], group: 'Catálogo' },
+  { label: 'Promociones', path: '/admin/promociones', permissions: ['promotions.view'], group: 'Catálogo' },
+  { label: 'Proveedores', path: '/admin/proveedores', permissions: ['suppliers.view'], group: 'Red' },
+  { label: 'Portal proveedor', path: '/admin/portal-proveedor', roles: ['SUPPLIER'], group: 'Red' },
+  { label: 'Inventario', path: '/admin/inventario', permissions: ['inventory.stock.view'], group: 'Flujo' },
+  { label: 'Reservas', path: '/admin/reservas', permissions: ['reservations.view'], group: 'Flujo' },
+  {
+    label: 'Reservas del día',
+    path: '/admin/reservas/dia',
+    permissions: ['reservations.view'],
+    roles: ['BRANCH_MANAGER', 'CASHIER'],
+    group: 'Flujo',
+  },
+  { label: 'Órdenes', path: '/admin/ordenes', permissions: ['orders.view'], group: 'Flujo' },
+  { label: 'Punto de venta', path: '/admin/pos', permissions: ['pos.sales'], group: 'Flujo' },
+  { label: 'Reportes', path: '/admin/reportes', permissions: ['reports.view'], group: 'Flujo' },
 ];
 
 export const ADMIN_SHELL = {
-  label: 'Administración',
-  accent: '#1e3a5f',
+  label: 'Operaciones',
+  accent: '#07111c',
 };
 
 export const ECOMMERCE_SHELL = {
-  label: 'FashionStore',
-  accent: '#b45309',
+  label: 'VETA',
+  accent: '#ff2d1a',
 };
+
+/** Orden de secciones en el sidebar. */
+export const ADMIN_NAV_GROUP_ORDER = ['Vista', 'Flujo', 'Catálogo', 'Red', 'Personas'] as const;

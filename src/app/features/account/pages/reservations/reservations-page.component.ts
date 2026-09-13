@@ -13,12 +13,12 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
   imports: [EmptyStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="page-title">Mis reservas</h1>
+    <h1 class="page-title">Reservas</h1>
     @if (loading()) {
       <p>Cargando…</p>
     } @else if (!reservations().length) {
       <app-empty-state
-        icon="📅"
+        icon=""
         title="Sin reservas"
         description="Reserva prendas desde el detalle de producto para probarlas en sucursal."
       />
@@ -41,14 +41,14 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
+    .page-title { margin: 0 0 1rem; }
     .row {
       display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
+      padding: 1rem; border: 1px solid var(--color-border);
       background: var(--color-surface); margin-bottom: 0.75rem;
     }
     .meta, .expire { margin: 0.25rem 0 0; color: var(--color-muted); font-size: 0.875rem; }
-    .expire { color: #b45309; }
+    .expire { color: var(--color-accent); }
     .right { text-align: right; display: grid; gap: 0.5rem; justify-items: end; }
     .status { font-size: 0.8125rem; }
   `,

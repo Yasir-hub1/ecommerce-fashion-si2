@@ -29,13 +29,14 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (loading()) {
-      <p>Preparando pago…</p>
+      <p class="muted">Preparando pago…</p>
     } @else if (order()) {
-      <div class="checkout">
+      <div class="checkout anim-rise">
         <div>
+          <p class="eyebrow">Checkout seguro</p>
           <h1>Pagar orden {{ order()!.code }}</h1>
           <p class="total">Total: {{ order()!.grand_total | price }}</p>
-          <p class="hint">El pago se confirma de forma segura con Stripe.</p>
+          <p class="hint">Confirmamos el pago con Stripe. No guardamos tu tarjeta en VETA.</p>
         </div>
         <div #paymentMount id="payment-element" class="payment-box"></div>
         <button
@@ -50,13 +51,19 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
+    .muted { color: var(--color-muted); }
     .checkout { max-width: 32rem; margin: 0 auto; }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; }
+    .eyebrow {
+      margin: 0 0 0.4rem; font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--color-accent); font-weight: 700;
+    }
+    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; letter-spacing: -0.03em; }
     .total { font-size: 1.25rem; font-weight: 700; }
     .hint { color: var(--color-muted); margin-bottom: 1rem; }
     .payment-box {
-      min-height: 8rem; padding: 1rem; border: 1px solid var(--color-border);
-      border-radius: 0.875rem; background: var(--color-surface); margin-bottom: 1rem;
+      min-height: 8rem; padding: 1rem;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface); margin-bottom: 1rem;
     }
   `,
 })

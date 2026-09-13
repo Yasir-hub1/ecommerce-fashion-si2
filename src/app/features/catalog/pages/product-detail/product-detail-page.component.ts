@@ -31,8 +31,8 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     } @else if (product()) {
       <div class="detail">
         <nav class="breadcrumb">
-          <a routerLink="/ecommerce">Catálogo</a>
-          <span>/</span>
+          <a routerLink="/ecommerce">Explorar</a>
+          <span aria-hidden="true">/</span>
           <span>{{ product()!.name }}</span>
         </nav>
 
@@ -158,49 +158,64 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
-    .breadcrumb { display: flex; gap: 0.5rem; color: var(--color-muted); font-size: 0.875rem; margin-bottom: 1rem; }
-    .breadcrumb a { color: inherit; }
-    .detail__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .detail { animation: veta-rise var(--duration-med) var(--ease-out) both; }
+    .breadcrumb { display: flex; gap: 0.5rem; color: var(--color-muted); font-size: 0.875rem; margin-bottom: 1.25rem; }
+    .breadcrumb a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+    .breadcrumb a:hover { border-bottom-color: var(--color-accent); color: var(--color-text); }
+    .detail__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.25rem; }
     .gallery img, .placeholder {
-      width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 1rem;
+      width: 100%; aspect-ratio: 4/5; object-fit: cover;
       background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
     }
     .placeholder { display: grid; place-items: center; color: var(--color-muted); }
     .thumbs { display: flex; gap: 0.5rem; margin-top: 0.75rem; overflow-x: auto; }
     .thumb {
-      border: 2px solid transparent; border-radius: 0.5rem; padding: 0; cursor: pointer;
+      border: 2px solid transparent; border-radius: var(--radius-sm); padding: 0; cursor: pointer;
       width: 4rem; height: 4rem; overflow: hidden; flex-shrink: 0; background: var(--color-surface-2);
     }
     .thumb img { width: 100%; height: 100%; object-fit: cover; }
     .thumb--active { border-color: var(--color-accent); }
-    .meta { color: var(--color-muted); margin: 0 0 0.25rem; font-size: 0.875rem; }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 2rem; }
-    .price { font-size: 1.25rem; font-weight: 700; margin: 0 0 1rem; }
+    .meta {
+      color: var(--color-muted); margin: 0 0 0.35rem; font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    h1 {
+      font-family: var(--font-display); margin: 0 0 0.5rem;
+      font-size: clamp(1.75rem, 3vw, 2.25rem); letter-spacing: -0.03em; font-weight: 700;
+    }
+    .price { font-size: 1.35rem; font-weight: 700; margin: 0 0 1rem; }
     .desc { color: var(--color-muted); line-height: 1.7; margin-bottom: 1.5rem; }
     .selector { margin-bottom: 1rem; }
-    .selector__label { font-size: 0.8125rem; font-weight: 600; margin: 0 0 0.5rem; }
+    .selector__label {
+      font-size: 0.75rem; font-weight: 700; margin: 0 0 0.5rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
     .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .chip {
       display: inline-flex; align-items: center; gap: 0.375rem;
       border: 1px solid var(--color-border); background: var(--color-surface);
-      border-radius: 999px; padding: 0.45rem 0.75rem; cursor: pointer; font: inherit;
+      border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; cursor: pointer; font: inherit;
+      transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
     }
-    .chip--size { min-width: 2.5rem; justify-content: center; border-radius: 0.5rem; }
-    .chip--active { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
-    .chip--disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
-    .swatch { width: 0.875rem; height: 0.875rem; border-radius: 999px; border: 1px solid rgba(0,0,0,0.1); }
-    .availability { font-size: 0.875rem; margin: 0.5rem 0 1rem; }
-    .availability--low { color: #b45309; font-weight: 600; }
+    .chip--size { min-width: 2.5rem; justify-content: center; }
+    .chip--active { border-color: var(--color-ink); background: var(--color-ink); color: #fff; }
+    .chip--disabled { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+    .swatch { width: 0.875rem; height: 0.875rem; border-radius: 2px; border: 1px solid rgba(0,0,0,0.12); }
+    .availability { font-size: 0.875rem; margin: 0.5rem 0 1rem; color: var(--color-teal); font-weight: 600; }
+    .availability--low { color: var(--color-accent); }
     .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
     .reservation-box {
-      margin-top: 1rem; padding: 1rem; border-radius: 0.875rem;
-      border: 1px dashed var(--color-border); background: var(--color-surface-2);
+      margin-top: 1rem; padding: 1rem;
+      border: 1px dashed var(--color-border); background: var(--color-surface);
+      border-left: 3px solid var(--color-accent);
     }
-    .reservation-box h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    .reservation-box h3 { margin: 0 0 0.5rem; font-size: 1rem; font-family: var(--font-display); }
     .hint { font-size: 0.8125rem; color: var(--color-muted); margin: 0 0 0.75rem; }
     .reservation-box label { display: grid; gap: 0.375rem; font-size: 0.875rem; margin-bottom: 0.75rem; }
     .reservation-box input {
-      border: 1px solid var(--color-border); border-radius: 0.625rem; padding: 0.625rem; font: inherit;
+      border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 0.625rem; font: inherit;
+      background: var(--color-bg);
     }
     @media (max-width: 900px) { .detail__grid { grid-template-columns: 1fr; } }
   `,

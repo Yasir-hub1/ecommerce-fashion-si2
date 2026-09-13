@@ -17,14 +17,26 @@ import { SidebarShellComponent } from '../sidebar-shell/sidebar-shell.component'
       [accent]="shell.accent"
       [navItems]="navItems()"
     >
+      <a sidebar-footer routerLink="/ecommerce" class="store-link">← Ir a la tienda</a>
       <app-portal-topbar topbar>
-        <span>{{ roleName() }}</span>
-        · Backoffice FashionStore
-        <a sidebar-footer routerLink="/ecommerce" class="store-link">Ir a e-commerce</a>
+        <span class="crumb">
+          <strong>{{ roleName() }}</strong>
+          · consolas VETA
+        </span>
       </app-portal-topbar>
     </app-sidebar-shell>
   `,
-  styles: `.store-link { font-size: 0.8125rem; color: var(--color-muted); text-decoration: none; }`,
+  styles: `
+    .store-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.55rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .store-link:hover { background: color-mix(in srgb, white 10%, transparent); }
+    .crumb strong { color: var(--color-text); font-weight: 650; }
+  `,
 })
 export class AdminShellComponent {
   private readonly permissions = inject(PermissionService);

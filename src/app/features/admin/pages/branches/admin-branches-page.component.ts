@@ -21,7 +21,7 @@ type Tab = 'branches' | 'cities';
     <header class="page-header">
       <div>
         <h1 class="page-title">Sucursales</h1>
-        <p class="subtitle">Ciudades y puntos de venta FashionStore (RF03).</p>
+        <p class="subtitle">Ciudades y puntos de venta VETA (RF03).</p>
       </div>
       @if (canManage()) {
         <button type="button" class="btn btn--primary" (click)="openCreate()">

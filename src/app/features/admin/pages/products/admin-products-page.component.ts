@@ -31,7 +31,7 @@ import { ADMIN_CRUD_STYLES } from '../../../../shared/styles/admin-crud.styles';
     <header class="page-header">
       <div>
         <h1 class="page-title">Productos</h1>
-        <p class="subtitle">Catálogo FashionStore · datos, imágenes y variantes.</p>
+        <p class="subtitle">Catálogo VETA · datos, imágenes y variantes.</p>
       </div>
       @if (canManage()) {
         <button type="button" class="btn btn--primary" (click)="openCreate()">Nuevo producto</button>

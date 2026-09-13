@@ -12,8 +12,10 @@ import { NotificationService } from '../../../../core/services/notification.serv
   imports: [FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="page-title">Asistente de moda</h1>
-    <p class="subtitle">Recomendaciones según temporada, talla y disponibilidad en tu sucursal</p>
+    <header class="head anim-rise">
+      <h1 class="page-title">Estilista</h1>
+      <p class="subtitle">Pregunta por outfits, tallas o stock en tu sucursal</p>
+    </header>
 
     <div class="chat" role="log" aria-live="polite">
       @for (msg of messages(); track $index) {
@@ -24,23 +26,37 @@ import { NotificationService } from '../../../../core/services/notification.serv
 
     <form class="input-row" (submit)="send($event)">
       <label class="sr-only" for="prompt">Consulta</label>
-      <input id="prompt" type="text" placeholder="Ej: ¿Qué camisa me recomiendas talla M?" [(ngModel)]="prompt" name="prompt" [disabled]="loading()" />
+      <input id="prompt" type="text" placeholder="Ej: ¿Camisa talla M disponible hoy?" [(ngModel)]="prompt" name="prompt" [disabled]="loading()" />
       <button type="submit" class="btn btn--primary" [disabled]="loading() || !prompt.trim()">Enviar</button>
     </form>
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0; }
-    .subtitle { color: var(--color-muted); margin: 0.25rem 0 1rem; }
+    .head { margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; }
+    .page-title { margin: 0; }
+    .subtitle { margin: 0.35rem 0 0; }
     .chat {
-      border: 1px solid var(--color-border); border-radius: 0.875rem;
-      padding: 1rem; background: var(--color-surface); min-height: 16rem; max-height: 28rem; overflow-y: auto;
-      display: grid; gap: 0.5rem; margin-bottom: 0.75rem;
+      border: 1px solid var(--color-border);
+      padding: 1rem; background: var(--color-surface);
+      min-height: 16rem; max-height: 28rem; overflow-y: auto;
+      display: grid; gap: 0.55rem; margin-bottom: 0.75rem;
     }
-    .bubble { max-width: 85%; padding: 0.625rem 0.875rem; border-radius: 0.75rem; background: var(--color-surface-2); font-size: 0.9375rem; line-height: 1.5; }
-    .bubble--user { justify-self: end; background: color-mix(in srgb, var(--color-accent) 12%, white); }
+    .bubble {
+      max-width: 85%; padding: 0.7rem 0.9rem;
+      background: var(--color-surface-2);
+      font-size: 0.9375rem; line-height: 1.5;
+    }
+    .bubble--user {
+      justify-self: end;
+      background: var(--color-ink);
+      color: #fff;
+    }
     .typing { color: var(--color-muted); font-size: 0.875rem; margin: 0; }
     .input-row { display: flex; gap: 0.5rem; }
-    input { flex: 1; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.625rem; font: inherit; }
+    input {
+      flex: 1; padding: 0.75rem;
+      border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+      font: inherit; background: var(--color-surface);
+    }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
   `,
 })
@@ -51,7 +67,7 @@ export class AssistantPageComponent {
 
   protected prompt = '';
   protected readonly messages = signal<ChatMessage[]>([
-    { role: 'assistant', content: '¡Hola! Pregúntame por outfits, tallas o disponibilidad en tu sucursal.' },
+    { role: 'assistant', content: 'Hola. Pregúntame por outfits, tallas o disponibilidad en tu sucursal.' },
   ]);
   protected readonly loading = signal(false);
 

@@ -11,55 +11,87 @@ import { NotificationService } from '../../../../core/services/notification.serv
   imports: [ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="auth-card">
-      <h1>Bienvenido de nuevo</h1>
-      <p class="subtitle">Inicia sesión para reservar, comprar y gestionar tu cuenta.</p>
+    <div class="auth-shell anim-rise">
+      <div class="auth-brand">
+        <p class="auth-brand__name">VETA</p>
+        <p class="auth-brand__line">Tu cuenta en tienda y online</p>
+      </div>
+      <div class="auth-card">
+        <h1>Entrar</h1>
+        <p class="subtitle">Reserva probador, compra y sigue tus pedidos.</p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <label>
-          Email
-          <input type="email" formControlName="email" autocomplete="email" />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" formControlName="password" autocomplete="current-password" />
-        </label>
-        <p class="forgot"><a routerLink="/auth/recuperar">¿Olvidaste tu contraseña?</a></p>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <label>
+            Email
+            <input type="email" formControlName="email" autocomplete="email" />
+          </label>
+          <label>
+            Contraseña
+            <input type="password" formControlName="password" autocomplete="current-password" />
+          </label>
+          <p class="forgot"><a routerLink="/auth/recuperar">¿Olvidaste tu contraseña?</a></p>
 
-        @if (error()) {
-          <p class="error" role="alert">{{ error() }}</p>
-        }
+          @if (error()) {
+            <p class="error" role="alert">{{ error() }}</p>
+          }
 
-        <button type="submit" class="btn btn--primary btn--block" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Entrando…' : 'Entrar' }}
-        </button>
-      </form>
+          <button type="submit" class="btn btn--primary btn--block" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Entrando…' : 'Entrar' }}
+          </button>
+        </form>
 
-      <p class="footer-link">
-        ¿No tienes cuenta?
-        <a routerLink="/auth/registro">Regístrate</a>
-      </p>
+        <p class="footer-link">
+          ¿No tienes cuenta?
+          <a routerLink="/auth/registro">Crear cuenta</a>
+        </p>
+      </div>
     </div>
   `,
   styles: `
-    .auth-card {
-      max-width: 26rem; margin: 2rem auto; padding: 2rem;
-      background: var(--color-surface); border: 1px solid var(--color-border);
-      border-radius: 1rem; box-shadow: var(--shadow-card);
+    .auth-shell { max-width: 26rem; margin: 2.5rem auto; }
+    .auth-brand { margin-bottom: 1rem; }
+    .auth-brand__name {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 2rem;
+      letter-spacing: -0.05em;
     }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 1.75rem; }
+    .auth-brand__line {
+      margin: 0.2rem 0 0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-muted);
+    }
+    .auth-card {
+      padding: 1.75rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-top: 3px solid var(--color-accent);
+      box-shadow: var(--shadow-card);
+    }
+    h1 {
+      font-family: var(--font-display);
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      letter-spacing: -0.03em;
+    }
     .subtitle { color: var(--color-muted); margin: 0 0 1.5rem; line-height: 1.5; }
     form { display: grid; gap: 1rem; }
     label { display: grid; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }
     input {
-      border: 1px solid var(--color-border); border-radius: 0.625rem;
-      padding: 0.75rem 0.875rem; font: inherit; background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.875rem;
+      font: inherit;
+      background: var(--color-bg);
     }
-    .error { color: #b91c1c; font-size: 0.875rem; margin: 0; }
+    .error { color: var(--color-danger); font-size: 0.875rem; margin: 0; }
     .forgot { margin: 0; text-align: right; font-size: 0.8125rem; }
     .forgot a { color: var(--color-accent); }
     .footer-link { margin-top: 1.25rem; text-align: center; color: var(--color-muted); font-size: 0.875rem; }
-    .footer-link a { color: var(--color-accent); }
+    .footer-link a { color: var(--color-accent); font-weight: 600; }
   `,
 })
 export class LoginPageComponent {

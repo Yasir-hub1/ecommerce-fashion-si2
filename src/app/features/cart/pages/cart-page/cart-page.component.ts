@@ -16,20 +16,20 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   imports: [RouterLink, PricePipe, EmptyStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="page-title">Tu carrito</h1>
+    <h1 class="page-title anim-rise">Carrito</h1>
 
     @if (cart.loading()) {
-      <p>Cargando carrito…</p>
+      <p class="muted">Cargando carrito…</p>
     } @else if (!cart.cart()?.items?.length) {
       <app-empty-state
-        icon="🛒"
-        title="Carrito vacío"
-        description="Explora el catálogo y agrega prendas con tu talla y color."
+        icon=""
+        title="Tu carrito está vacío"
+        description="Elige talla y color en el catálogo para agregar prendas."
       >
-        <a routerLink="/ecommerce" class="btn btn--primary">Ver catálogo</a>
+        <a routerLink="/ecommerce" class="btn btn--primary">Explorar</a>
       </app-empty-state>
     } @else {
-      <div class="cart-layout">
+      <div class="cart-layout anim-fade">
         <div class="items">
           @for (item of cart.cart()!.items; track item.id) {
             <article class="item">
@@ -45,7 +45,7 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
                 <span>{{ item.quantity }}</span>
                 <button type="button" (click)="updateQty(item.id, item.quantity + 1)">+</button>
               </div>
-              <button type="button" class="remove" (click)="remove(item.id)">Eliminar</button>
+              <button type="button" class="remove" (click)="remove(item.id)">Quitar</button>
             </article>
           }
         </div>
@@ -62,26 +62,28 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1.5rem; }
+    .muted { color: var(--color-muted); }
     .cart-layout { display: grid; grid-template-columns: 1fr 18rem; gap: 1.5rem; align-items: start; }
     .item {
       display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center;
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
+      padding: 1rem; border: 1px solid var(--color-border);
       background: var(--color-surface); margin-bottom: 0.75rem;
     }
+    h2 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; letter-spacing: -0.02em; }
     .meta { color: var(--color-muted); font-size: 0.875rem; margin: 0.25rem 0; }
     .price { font-weight: 700; margin: 0; }
     .qty { display: flex; align-items: center; gap: 0.5rem; }
     .qty button {
-      width: 2rem; height: 2rem; border-radius: 0.5rem; border: 1px solid var(--color-border);
-      background: var(--color-surface-2); cursor: pointer;
+      width: 2rem; height: 2rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border); background: var(--color-surface-2); cursor: pointer;
     }
-    .remove { background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 0.875rem; }
+    .remove { background: none; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.875rem; font-weight: 600; }
     .summary {
-      position: sticky; top: 5rem; padding: 1rem; border-radius: 0.875rem;
+      position: sticky; top: 5rem; padding: 1.1rem;
       border: 1px solid var(--color-border); background: var(--color-surface);
+      border-top: 3px solid var(--color-accent);
     }
-    .summary h2 { margin: 0 0 0.75rem; font-size: 1.125rem; }
+    .summary h2 { margin: 0 0 0.75rem; font-size: 1.05rem; font-family: var(--font-display); }
     .total { font-size: 1.125rem; font-weight: 700; margin: 1rem 0; }
     @media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } }
   `,

@@ -41,11 +41,11 @@ import { NotificationService } from '../../../../core/services/notification.serv
   `,
   styles: `
     .auth-card {
-      max-width: 26rem; margin: 2rem auto; padding: 2rem;
+      max-width: 26rem; margin: 2.5rem auto; padding: 1.75rem;
       background: var(--color-surface); border: 1px solid var(--color-border);
-      border-radius: 1rem; box-shadow: var(--shadow-card);
+      border-top: 3px solid var(--color-accent); box-shadow: var(--shadow-card);
     }
-    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 1.75rem; }
+    h1 { font-family: var(--font-display); margin: 0 0 0.5rem; font-size: 1.5rem; letter-spacing: -0.03em; }
     .subtitle { color: var(--color-muted); margin: 0 0 1.5rem; line-height: 1.5; }
     label { display: grid; gap: 0.35rem; margin-bottom: 1rem; font-size: 0.875rem; font-weight: 500; }
     input {

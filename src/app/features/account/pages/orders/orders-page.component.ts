@@ -15,11 +15,11 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
   imports: [RouterLink, PricePipe, EmptyStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="page-title">Mis compras</h1>
+    <h1 class="page-title">Pedidos</h1>
     @if (loading()) {
       <p>Cargando…</p>
     } @else if (!orders().length) {
-      <app-empty-state icon="📦" title="Sin compras" description="Tus pedidos aparecerán aquí." />
+      <app-empty-state icon="" title="Sin pedidos" description="Tus compras aparecerán aquí." />
     } @else {
       @for (order of orders(); track order.id) {
         <a [routerLink]="['/ecommerce/cuenta/pedidos', order.id]" class="row">
@@ -36,12 +36,14 @@ import { PricePipe } from '../../../../shared/pipes/price.pipe';
     }
   `,
   styles: `
-    .page-title { font-family: var(--font-display); margin: 0 0 1rem; }
+    .page-title { margin: 0 0 1rem; }
     .row {
       display: flex; justify-content: space-between; gap: 1rem; align-items: center;
-      padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.875rem;
+      padding: 1rem; border: 1px solid var(--color-border);
       background: var(--color-surface); margin-bottom: 0.75rem; text-decoration: none; color: inherit;
+      transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
     }
+    .row:hover { border-color: var(--color-ink); transform: translateY(-1px); }
     .meta { margin: 0.25rem 0 0; color: var(--color-muted); font-size: 0.875rem; }
     .right { text-align: right; display: grid; gap: 0.25rem; }
     .status { font-size: 0.8125rem; color: var(--color-muted); }
