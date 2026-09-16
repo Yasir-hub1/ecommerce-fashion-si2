@@ -18,7 +18,13 @@ import { ReservationsApi } from '../../../../core/api/reservations.api';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PosBranchService } from '../../../../core/services/pos-branch.service';
 import type { ReservationDetail, ReservationListItem } from '../../../../core/models/api.models';
-import type { PosPaymentInput, PosQuote, PosSearchResult } from '../../../../core/models/pos.models';
+import type {
+  PosCustomer,
+  PosCustomerCreatePayload,
+  PosPaymentInput,
+  PosQuote,
+  PosSearchResult,
+} from '../../../../core/models/pos.models';
 import { PosSubnavComponent } from '../../components/pos-subnav/pos-subnav.component';
 import { PricePipe } from '../../../../shared/pipes/price.pipe';
 
@@ -164,6 +170,99 @@ interface PosLine {
             }
           }
 
+          <div class="customer-block">
+            <label class="res-label">Cliente (comprobante)
+              <div class="search-combobox search-combobox--res">
+                <input
+                  type="text"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="pos-customer-listbox"
+                  [attr.aria-expanded]="customerSuggestOpen()"
+                  placeholder="Nombre, CI, NIT, email o teléfono…"
+                  [(ngModel)]="customerQuery"
+                  (ngModelChange)="onCustomerQueryChange($event)"
+                  (keydown.enter)="onCustomerEnter($event)"
+                  (keydown.arrowDown)="onCustomerArrowDown($event)"
+                  (keydown.arrowUp)="onCustomerArrowUp($event)"
+                  (keydown.escape)="closeCustomerSuggestions()"
+                  (focus)="onCustomerFocus()"
+                  (blur)="onCustomerBlur()"
+                />
+                @if (customerSuggestOpen()) {
+                  <ul id="pos-customer-listbox" role="listbox" class="suggestions">
+                    @if (customerSuggestLoading()) {
+                      <li class="suggestion suggestion--muted" role="presentation">Buscando…</li>
+                    } @else if (!customerSuggestions().length) {
+                      <li class="suggestion suggestion--muted" role="presentation">Sin clientes — crea uno abajo</li>
+                    } @else {
+                      @for (c of customerSuggestions(); track c.id; let i = $index) {
+                        <li
+                          role="option"
+                          [id]="'pos-cust-' + c.id"
+                          [attr.aria-selected]="customerActiveIndex() === i"
+                          class="suggestion"
+                          [class.suggestion--active]="customerActiveIndex() === i"
+                          (mousedown)="selectCustomer(c, $event)"
+                        >
+                          <strong>{{ c.full_name }}</strong>
+                          <span class="suggestion__sku">
+                            @if (c.document_number) {
+                              {{ c.document_label || c.document_type }} {{ c.document_number }}
+                            } @else {
+                              Sin documento
+                            }
+                          </span>
+                          <span class="suggestion__meta">{{ c.email || c.phone || '—' }}</span>
+                        </li>
+                      }
+                    }
+                  </ul>
+                }
+              </div>
+            </label>
+
+            @if (selectedCustomer(); as c) {
+              <div class="customer-card">
+                <div>
+                  <strong>{{ c.full_name }}</strong>
+                  <p>
+                    @if (c.document_number) {
+                      {{ c.document_label || c.document_type }}: {{ c.document_number }}
+                    } @else {
+                      Sin CI/NIT
+                    }
+                  </p>
+                </div>
+                <button type="button" class="chip" (click)="clearCustomer()">Quitar</button>
+              </div>
+            } @else {
+              <details class="customer-create">
+                <summary>Registrar cliente rápido (CI/NIT)</summary>
+                <div class="customer-create__form">
+                  <input type="text" placeholder="Nombre" [(ngModel)]="newCustomerFirstName" />
+                  <input type="text" placeholder="Apellido" [(ngModel)]="newCustomerLastName" />
+                  <select [(ngModel)]="newCustomerDocType">
+                    <option value="CI">CI</option>
+                    <option value="NIT">NIT</option>
+                    <option value="PASSPORT">Pasaporte</option>
+                    <option value="OTHER">Otro</option>
+                  </select>
+                  <input type="text" placeholder="Número de documento" [(ngModel)]="newCustomerDocNumber" />
+                  <input type="tel" placeholder="Teléfono (opcional)" [(ngModel)]="newCustomerPhone" />
+                  <button
+                    type="button"
+                    class="btn btn--primary btn--block"
+                    [disabled]="creatingCustomer()"
+                    (click)="createCustomer()"
+                  >
+                    {{ creatingCustomer() ? 'Guardando…' : 'Usar en esta venta' }}
+                  </button>
+                </div>
+              </details>
+            }
+          </div>
+
         </section>
 
         <section class="sale-panel">
@@ -262,6 +361,20 @@ interface PosLine {
     .suggestion--ready strong { color: var(--color-accent); }
     .res-info { font-size: 0.8125rem; color: var(--color-muted); margin: 0.5rem 0; }
     .chip { border: 1px solid var(--color-border); background: var(--color-bg); border-radius: 999px; padding: 0.4rem 0.75rem; cursor: pointer; font: inherit; font-size: 0.8125rem; }
+    .customer-block { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--color-border); }
+    .customer-card {
+      display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+      margin-top: 0.5rem; padding: 0.75rem; border: 1px solid var(--color-border);
+      border-radius: 0.625rem; background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    }
+    .customer-card p { margin: 0.15rem 0 0; font-size: 0.8125rem; color: var(--color-muted); }
+    .customer-create { margin-top: 0.5rem; font-size: 0.875rem; }
+    .customer-create summary { cursor: pointer; color: var(--color-muted); }
+    .customer-create__form { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
+    .customer-create__form select {
+      width: 100%; border: 1px solid var(--color-border); border-radius: 0.625rem;
+      padding: 0.75rem; font: inherit; background: var(--color-surface);
+    }
     .line { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); }
     .line--warn { background: color-mix(in srgb, #b45309 6%, transparent); border-radius: 0.375rem; padding-inline: 0.25rem; }
     .line p { margin: 0; font-size: 0.8125rem; color: var(--color-muted); }
@@ -328,9 +441,11 @@ export class PosSalePageComponent implements OnInit {
   private handleBranchChange(): void {
     this.closeSuggestions();
     this.closeResSuggestions();
+    this.closeCustomerSuggestions();
     this.suggestions.set([]);
     this.reservationSuggestions.set([]);
-    if (this.lines().length || this.activeReservation()) {
+    this.customerSuggestions.set([]);
+    if (this.lines().length || this.activeReservation() || this.selectedCustomer()) {
       this.lines.set([]);
       this.quote.set(null);
       this.paymentPreview.set(null);
@@ -338,12 +453,19 @@ export class PosSalePageComponent implements OnInit {
       this.activeReservation.set(null);
       this.activeReservationId = null;
       this.reservationCode = '';
+      this.clearCustomer();
       this.notifications.info('Sucursal cambiada — venta reiniciada');
     }
   }
 
   protected query = '';
   protected reservationCode = '';
+  protected customerQuery = '';
+  protected newCustomerFirstName = '';
+  protected newCustomerLastName = '';
+  protected newCustomerDocType: PosCustomerCreatePayload['document_type'] = 'CI';
+  protected newCustomerDocNumber = '';
+  protected newCustomerPhone = '';
 
   protected readonly cashReceived = signal(0);
   protected readonly suggestions = signal<PosSearchResult[]>([]);
@@ -362,6 +484,12 @@ export class PosSalePageComponent implements OnInit {
   protected readonly quoting = signal(false);
   protected readonly selling = signal(false);
   protected readonly activeReservation = signal<ReservationDetail | null>(null);
+  protected readonly selectedCustomer = signal<PosCustomer | null>(null);
+  protected readonly customerSuggestions = signal<PosCustomer[]>([]);
+  protected readonly customerSuggestOpen = signal(false);
+  protected readonly customerSuggestLoading = signal(false);
+  protected readonly customerActiveIndex = signal(-1);
+  protected readonly creatingCustomer = signal(false);
 
   protected readonly amountDue = computed(() => {
     const q = this.quote();
@@ -406,6 +534,9 @@ export class PosSalePageComponent implements OnInit {
   private resSuggestTimer: ReturnType<typeof setTimeout> | null = null;
   private resSuggestBlurTimer: ReturnType<typeof setTimeout> | null = null;
   private resSuggestRequestId = 0;
+  private customerSuggestTimer: ReturnType<typeof setTimeout> | null = null;
+  private customerSuggestBlurTimer: ReturnType<typeof setTimeout> | null = null;
+  private customerSuggestRequestId = 0;
 
   @HostListener('window:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
@@ -707,6 +838,20 @@ export class PosSalePageComponent implements OnInit {
       this.activeReservation.set(detail);
       this.activeReservationId = detail.id;
       this.reservationCode = detail.code;
+      if (detail.customer) {
+        this.selectedCustomer.set({
+          id: detail.customer,
+          first_name: '',
+          last_name: '',
+          full_name: detail.customer_name,
+          email: detail.customer_email ?? '',
+          phone: detail.customer_phone ?? '',
+          document_type: detail.customer_document_type ?? '',
+          document_number: detail.customer_document_number ?? '',
+          document_label: detail.customer_document_label ?? '',
+        });
+        this.customerQuery = detail.customer_name;
+      }
       if (detail.status !== 'READY' && detail.status !== 'IN_FITTING') {
         this.notifications.warn(`Reserva en estado ${detail.status_display} — no se puede cobrar aún`);
       }
@@ -714,6 +859,131 @@ export class PosSalePageComponent implements OnInit {
       this.notifications.error('Reserva no encontrada o no disponible');
     } finally {
       this.reservationLoading.set(false);
+    }
+  }
+
+  onCustomerQueryChange(value: string): void {
+    if (this.customerSuggestTimer) clearTimeout(this.customerSuggestTimer);
+    if (this.selectedCustomer()) {
+      this.selectedCustomer.set(null);
+    }
+    const q = value.trim();
+    if (q.length < 2) {
+      this.closeCustomerSuggestions();
+      return;
+    }
+    this.customerSuggestOpen.set(true);
+    this.customerSuggestLoading.set(true);
+    this.customerSuggestTimer = setTimeout(() => void this.fetchCustomerSuggestions(q), 250);
+  }
+
+  onCustomerFocus(): void {
+    if (this.customerSuggestBlurTimer) clearTimeout(this.customerSuggestBlurTimer);
+    if (this.customerQuery.trim().length >= 2 && !this.selectedCustomer()) {
+      this.customerSuggestOpen.set(true);
+    }
+  }
+
+  onCustomerBlur(): void {
+    this.customerSuggestBlurTimer = setTimeout(() => this.closeCustomerSuggestions(), 150);
+  }
+
+  closeCustomerSuggestions(): void {
+    this.customerSuggestOpen.set(false);
+    this.customerSuggestLoading.set(false);
+    this.customerActiveIndex.set(-1);
+  }
+
+  onCustomerEnter(event: Event): void {
+    event.preventDefault();
+    const items = this.customerSuggestions();
+    const idx = this.customerActiveIndex();
+    if (this.customerSuggestOpen() && idx >= 0 && items[idx]) {
+      this.selectCustomer(items[idx]);
+      return;
+    }
+    void this.fetchCustomerSuggestions(this.customerQuery.trim());
+  }
+
+  onCustomerArrowDown(event: Event): void {
+    event.preventDefault();
+    const max = this.customerSuggestions().length - 1;
+    if (max < 0) return;
+    this.customerSuggestOpen.set(true);
+    this.customerActiveIndex.update((i) => (i < max ? i + 1 : 0));
+  }
+
+  onCustomerArrowUp(event: Event): void {
+    event.preventDefault();
+    const max = this.customerSuggestions().length - 1;
+    if (max < 0) return;
+    this.customerSuggestOpen.set(true);
+    this.customerActiveIndex.update((i) => (i > 0 ? i - 1 : max));
+  }
+
+  selectCustomer(customer: PosCustomer, event?: Event): void {
+    event?.preventDefault();
+    this.selectedCustomer.set(customer);
+    this.customerQuery = customer.full_name;
+    this.customerSuggestions.set([]);
+    this.closeCustomerSuggestions();
+  }
+
+  clearCustomer(): void {
+    this.selectedCustomer.set(null);
+    this.customerQuery = '';
+    this.customerSuggestions.set([]);
+    this.closeCustomerSuggestions();
+  }
+
+  private async fetchCustomerSuggestions(q: string): Promise<void> {
+    if (q.length < 2) return;
+    const requestId = ++this.customerSuggestRequestId;
+    this.customerSuggestLoading.set(true);
+    try {
+      const res = await firstValueFrom(this.posApi.searchCustomers(q, 12));
+      if (requestId !== this.customerSuggestRequestId) return;
+      this.customerSuggestions.set(res.results);
+      this.customerActiveIndex.set(res.results.length ? 0 : -1);
+    } catch {
+      if (requestId !== this.customerSuggestRequestId) return;
+      this.customerSuggestions.set([]);
+    } finally {
+      if (requestId === this.customerSuggestRequestId) {
+        this.customerSuggestLoading.set(false);
+      }
+    }
+  }
+
+  async createCustomer(): Promise<void> {
+    const first = this.newCustomerFirstName.trim();
+    const last = this.newCustomerLastName.trim();
+    const doc = this.newCustomerDocNumber.trim();
+    if (!first || !last || !doc) {
+      this.notifications.warn('Nombre, apellido y documento son obligatorios');
+      return;
+    }
+    this.creatingCustomer.set(true);
+    try {
+      const customer = await firstValueFrom(
+        this.posApi.createCustomer({
+          first_name: first,
+          last_name: last,
+          document_type: this.newCustomerDocType,
+          document_number: doc,
+          phone: this.newCustomerPhone.trim() || undefined,
+        }),
+      );
+      this.selectCustomer(customer);
+      this.newCustomerFirstName = '';
+      this.newCustomerLastName = '';
+      this.newCustomerDocNumber = '';
+      this.newCustomerPhone = '';
+      this.notifications.success(`Cliente ${customer.full_name} listo para el comprobante`);
+    } catch (err: unknown) {
+      this.notifications.error(this.extractError(err, 'No se pudo registrar el cliente'));
+    } finally {
+      this.creatingCustomer.set(false);
     }
   }
 
@@ -860,11 +1130,13 @@ export class PosSalePageComponent implements OnInit {
     this.selling.set(true);
     try {
       await this.refreshPaymentPreview();
+      const customerId = this.selectedCustomer()?.id;
       const res = await firstValueFrom(
         this.posApi.checkout({
           items,
           payments,
           branch_id: this.branchId(),
+          ...(customerId ? { customer_id: customerId } : {}),
           ...(this.activeReservationId ? { reservation_id: this.activeReservationId } : {}),
         }),
       );
@@ -896,6 +1168,12 @@ export class PosSalePageComponent implements OnInit {
     this.activeReservation.set(null);
     this.activeReservationId = null;
     this.reservationCode = '';
+    this.clearCustomer();
+    this.newCustomerFirstName = '';
+    this.newCustomerLastName = '';
+    this.newCustomerDocNumber = '';
+    this.newCustomerPhone = '';
+    this.newCustomerDocType = 'CI';
   }
 
   private extractError(err: unknown, fallback: string): string {

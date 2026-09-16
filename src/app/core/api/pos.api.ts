@@ -10,6 +10,9 @@ import type {
 } from '../models/api.models';
 import type {
   PosCheckoutResponse,
+  PosCustomer,
+  PosCustomerCreatePayload,
+  PosCustomerSearchResponse,
   PosDailySummary,
   PosPaymentInput,
   PosPaymentPreview,
@@ -96,6 +99,16 @@ export class PosApi {
     return this.http.get<PosDailySummary>(`${this.base}/daily-summary/`, {
       params: toHttpParams({ date, branch_id: branchId }),
     });
+  }
+
+  searchCustomers(q: string, limit = 20): Observable<PosCustomerSearchResponse> {
+    return this.http.get<PosCustomerSearchResponse>(`${this.base}/customers/`, {
+      params: toHttpParams({ q, limit }),
+    });
+  }
+
+  createCustomer(payload: PosCustomerCreatePayload): Observable<PosCustomer> {
+    return this.http.post<PosCustomer>(`${this.base}/customers/create/`, payload);
   }
 
   listSales(params?: Record<string, string | number>): Observable<PaginatedResponse<PosSaleListItem>> {

@@ -104,3 +104,29 @@ export interface PosSaleListItem {
   created_at: string;
   customer_name?: string;
 }
+
+export interface PosCustomer {
+  id: number;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  document_type: string;
+  document_number: string;
+  document_label: string;
+}
+
+export interface PosCustomerSearchResponse {
+  count: number;
+  results: PosCustomer[];
+}
+
+export interface PosCustomerCreatePayload {
+  first_name: string;
+  last_name: string;
+  document_type: 'CI' | 'NIT' | 'PASSPORT' | 'OTHER';
+  document_number: string;
+  email?: string;
+  phone?: string;
+}

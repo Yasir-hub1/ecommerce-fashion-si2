@@ -216,6 +216,7 @@ export interface ReservationListItem {
 }
 
 export interface ReservationDetail extends ReservationListItem {
+  customer: number;
   items: {
     id: number;
     variant: ProductVariant;
@@ -227,6 +228,10 @@ export interface ReservationDetail extends ReservationListItem {
   notes: string;
   branch: number;
   customer_email?: string;
+  customer_phone?: string;
+  customer_document_type?: string;
+  customer_document_number?: string;
+  customer_document_label?: string;
 }
 
 export interface CheckoutSessionData {

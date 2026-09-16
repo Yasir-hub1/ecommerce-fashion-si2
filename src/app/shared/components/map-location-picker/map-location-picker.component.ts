@@ -168,7 +168,7 @@ export class MapLocationPickerComponent {
   private marker: Marker | null = null;
   private userDot: CircleMarker | null = null;
   private userAccuracy: Circle | null = null;
-  private leaflet: typeof import('leaflet') | null = null;
+  private leaflet: LeafletNS | null = null;
   private syncingFromParent = false;
   private destroyed = false;
 
@@ -228,15 +228,19 @@ export class MapLocationPickerComponent {
   private async initMap(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const L = await import('leaflet');
+    const L = await loadLeaflet();
     this.leaflet = L;
 
-    delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    });
+    // Iconos del marker (Leaflet no resuelve bien las rutas con el bundler)
+    const DefaultIcon = L.Icon?.Default;
+    if (DefaultIcon) {
+      delete (DefaultIcon.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
+      DefaultIcon.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      });
+    }
 
     const host = this.mapHost().nativeElement;
     const lat = this.latitude();
@@ -404,6 +408,20 @@ export class MapLocationPickerComponent {
       map.setView(position, Math.max(map.getZoom(), PIN_ZOOM));
     }
   }
+}
+
+/** Leaflet namespace resolved from CJS/ESM interop (Angular/Vite). */
+type LeafletNS = typeof import('leaflet');
+
+async function loadLeaflet(): Promise<LeafletNS> {
+  const mod = await import('leaflet');
+  // Con el bundler de Angular, la API suele estar en `default`
+  const resolved =
+    (mod as unknown as { default?: LeafletNS }).default ?? (mod as unknown as LeafletNS);
+  if (!resolved?.map || !resolved?.tileLayer) {
+    throw new Error('No se pudo cargar Leaflet correctamente');
+  }
+  return resolved;
 }
 
 function round6(n: number): number {
